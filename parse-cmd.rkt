@@ -1,4 +1,4 @@
-#lang racket
+#lang racket/base
 
 (require megaparsack megaparsack/text)
 (require data/monad data/applicative)
