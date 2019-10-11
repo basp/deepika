@@ -3,7 +3,7 @@
 (require megaparsack megaparsack/text)
 (require data/monad data/applicative)
 
-(define arg-char/p (char-not-in/p "\" "))
+(define identifier-char/p (char-not-in/p "\" "))
 
 (define arg/p
   (do [h <- arg-char/p]    
