@@ -1,9 +1,14 @@
 #lang racket/base
 
-(require megaparsack megaparsack/text)
-(require data/monad data/applicative)
+(require megaparsack
+         megaparsack/text)
+
+(require data/monad
+         data/applicative)
 
 (define ident-char/p (char-not-in/p "\" "))
+
+(provide parse/args)
 
 (define arg/p
   (do [h <- ident-char/p]    
@@ -25,5 +30,5 @@
   (do (many/p space/p)
       (many/p arg*/p)))
 
-(define (parse/cmd argstr)
+(define (parse/args argstr)
   (parse-result! (parse-string args/p argstr)))
