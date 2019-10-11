@@ -3,11 +3,11 @@
 (require megaparsack megaparsack/text)
 (require data/monad data/applicative)
 
-(define identifier-char/p (char-not-in/p "\" "))
+(define ident-char/p (char-not-in/p "\" "))
 
 (define arg/p
-  (do [h <- arg-char/p]    
-      [t <- (many/p arg-char/p)]
+  (do [h <- ident-char/p]    
+      [t <- (many/p ident-char/p)]
       (pure (list->string (cons h t)))))
 
 (define quoted-arg/p
