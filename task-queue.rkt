@@ -21,9 +21,10 @@
        (for/list ([t ts])
          ((delayed-task-proc t))))
      (let loop ()
-       (define ready-tasks (get-ready-tasks))
-       (run-tasks ready-tasks)
-       (set! tasks (remove* ready-tasks tasks))
+       (begin
+         (define ready-tasks (get-ready-tasks))
+         (run-tasks ready-tasks)
+         (set! tasks (remove* ready-tasks tasks)))
        (match (thread-try-receive)
          [(task proc)
           (proc)
@@ -35,7 +36,8 @@
           (displayln tasks)
           (loop)]
          [#f
-          (sleep 1/60) ; 60 fps
+          ; TODO: proper sleep time based on execution time
+          (sleep 1/60) 
           (loop)]
          ['done
           (printf "Done~n")])))))
