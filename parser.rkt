@@ -6,9 +6,9 @@
 (require data/monad
          data/applicative)
 
-(define ident-char/p (char-not-in/p "\" "))
-
 (provide parse/args)
+
+(define ident-char/p (char-not-in/p "\" "))
 
 (define arg/p
   (do [h <- ident-char/p]    
