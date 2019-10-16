@@ -2,4 +2,9 @@
 Wannabe spiritual successor to LambdaMOO.
 
 ## Overview
-This is so much a sandbox that I even had to scrap most of the README.
+This is very much a work in progress. The following stuff is *blissfully* implemented:
+
+* basic database (`db-sig.rkt` and `db-unit.rkt`)
+* task queue (`task-queue.rkt`)
+* command parser (`parser.rkt` and `parser-test.rkt`)
+* common infrastructure such as `objid` and friends (`common.rkt`)
