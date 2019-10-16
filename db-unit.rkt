@@ -20,6 +20,8 @@
       (field [location $nothing])
       (field [contents (set)])
       (field [children (set)])
+      (field [verbs (set)])
+      (field [props (set)])
       (super-new)))
 
   (define idx (make-hash))
@@ -96,6 +98,24 @@
     (transfer! oid from to 'contents)
     (set-field! location obj v))
 
+  (define (get-verbs oid)
+    (set->list (get-field verbs (find-object oid))))
+
+  (define (get-props oid)
+    (set->list (get-field props (find-object oid))))
+
+  (define (add-prop oid v)
+    (define obj (find-object oid))
+    (define old-vs (get-field props obj))
+    (define new-vs (set-add old-vs v))
+    (set-field! props obj new-vs))
+
+  (define (add-verb oid v)
+    (define obj (find-object oid))
+    (define old-vs (get-field verbs obj))
+    (define new-vs (set-add old-vs v))
+    (set-field! verbs obj new-vs))
+  
   (define (get-contents oid)
     (get-field contents (find-object oid)))
 
