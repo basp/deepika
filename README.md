@@ -30,6 +30,15 @@ The object database `unit` is more or less functional although it isn't really h
 ```
 
 The VM can barely walk although it *is* able to execute built-in procedures. There are two example procedures in `VM.rkt` that more or less show how it is going to be used in the future (the API *will* change though).
+
+In the next example we assume that a `notify` function is in scope. In this case it is defined like this:
+```
+(define (notify x)
+  (displayln (string-append "frotz: " x)))
+```
+
+We can play around with the VM by pushing (and popping) values and executing instructions:
+
 ```
 > (push! notify)                            ; built-in functiion
 > (push! (list "Hello from Deepika~!"))     ; arguments
