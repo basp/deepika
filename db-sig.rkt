@@ -13,7 +13,6 @@
     [valid*? (-> any/c boolean?)]
     [create-object! (-> valid*? valid?)]
     [destroy-object! (-> valid? void?)]
-    [objects (-> (listof valid?))]
     [get-object-name (-> valid? string?)]
     [set-object-name! (-> valid? string? void?)]
     [get-parent (-> valid? valid*?)]
@@ -22,6 +21,7 @@
     [set-location! (-> valid? valid*? void?)]
     [get-contents (-> valid? set?)]
     [get-children (-> valid? set?)]
+    [objects (-> (listof valid?))]
     [for/objects (-> procedure? void?)])))
 
 (provide db^)

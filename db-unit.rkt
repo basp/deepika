@@ -33,8 +33,7 @@
     (or (nothing? oid)
         (valid? oid)))
   
-  (define/contract (transfer! oid from to field-name)
-    (-> objid? object? object? symbol? void?)
+  (define (transfer! oid from to field-name)
     (define (exec-set-op! op obj)
       (match obj
         (x #:when (nothing? x) (void))
@@ -44,8 +43,7 @@
     (exec-set-op! set-remove from)
     (exec-set-op! set-add to))
 
-  (define/contract (find-object oid)
-    (-> objid? (or/c object? nothing?))
+  (define (find-object oid)
     (define id (objid-id oid))
     (match (hash-has-key? idx id)
       (#t (hash-ref idx id))
