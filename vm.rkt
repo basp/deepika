@@ -44,3 +44,15 @@
         [verb (pop!)]
         [obj (pop!)])
     (displayln 'ok)))
+
+(define (example-01)
+  (begin
+    (push! +)
+    (push! (list 1 2 3))
+    (call-bi!)))
+
+(define (example-02)
+  (begin
+    (push! notify)
+    (push! (list "hello from deepika!"))
+    (call-bi!)))
