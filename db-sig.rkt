@@ -21,7 +21,7 @@
     [objects (-> (listof valid?))]
     [get-object-name (-> valid? string?)]
     [set-object-name! (-> valid? string? void?)]
-    [get-object-parent (-> valid? (or/c valid? nothing?))]
-    [set-object-parent! (-> valid? (or/c valid? nothing?) void?)])))
+    [get-parent (-> valid? (or/c valid? nothing?))]
+    [set-parent! (-> valid? (or/c valid? nothing?) void?)])))
 
 (provide db^)

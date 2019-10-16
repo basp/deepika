@@ -68,11 +68,17 @@
   (define (set-object-name! oid v)
     (set-field! name (find-object oid) v))
 
-  (define (get-object-parent oid)
+  (define (get-parent oid)
     (get-field parent (find-object oid)))
 
-  (define (set-object-parent! oid v)
+  (define (set-parent! oid v)
     (set-field! parent (find-object oid) v))
+ 
+  (define (get-location oid)
+    (get-field location (find-object oid)))
+
+  (define (set-location! oid v)
+    (set-field! location (find-object oid) v))
   
   (create-object! $nothing))
 
