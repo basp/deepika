@@ -1,5 +1,7 @@
 #lang racket
 
+; TODO: provide access to db/objects
+
 (struct state (env))
 
 (define stack null)
@@ -36,3 +38,9 @@
   (let ([args (pop!)]
         [fn (pop!)])
     (apply fn args)))
+
+(define (call-verb!)
+  (let ([args (pop!)]
+        [verb (pop!)]
+        [obj (pop!)])
+    (displayln 'ok)))
