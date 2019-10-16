@@ -5,22 +5,8 @@
          racket/match
          racket/unit
          racket/contract
-         "base.rkt")
-
-(define-signature db^
-  ((contracted
-    [object% class?]
-    [$nothing objid?]
-    [$ambiguous-match objid?]
-    [$failed-match objid?]
-    [$nothing? (-> any/c boolean?)]
-    [valid? (-> any/c boolean?)]
-    [create-object! (-> objid? objid?)]
-    [destroy-object! (-> objid? void?)]
-    [find-object (-> objid? (or/c $nothing? object?))]
-    [objects (-> (listof objid?))]
-    [db-object-name (-> valid? string?)]
-    [db-set-object-name! (-> valid? string? void?)])))
+         "structures.rkt"
+         "db-sig.rkt")
 
 (define-unit db@
   (import)
@@ -39,7 +25,7 @@
   (define $ambiguous-match (objid -2))
   (define $failed-match (objid -3))
 
-  (define ($nothing? oid)
+  (define (nothing? oid)
     (equal? oid $nothing))
 
   (define idx (make-hash))
@@ -63,7 +49,7 @@
     (hash-remove! idx (objid-id oid)))
 
   (define (objects)
-    (map (λ (x) (get-field id x)) (hash-values idx)))
+    (filter valid? (map (λ (x) (get-field id x)) (hash-values idx))))
 
   (define (find-object oid)
     (define id (objid-id oid))
@@ -74,18 +60,20 @@
   (define (valid? oid)
     (define id (objid-id oid))
     (and (> id 0)
-         (hash-has-key? idx id)))
+         (hash-has-key? idx (objid-id oid))))
 
-  (define (db-object-name oid)
-    (define obj (find-object oid))
-    (get-field name obj))
+  (define (get-object-name oid)
+    (get-field name (find-object oid)))
 
-  (define (db-set-object-name! oid new-name)
-    (define obj (find-object oid))
-    (set-field! name obj new-name))
+  (define (set-object-name! oid v)
+    (set-field! name (find-object oid) v))
+
+  (define (get-object-parent oid)
+    (get-field parent (find-object oid)))
+
+  (define (set-object-parent! oid v)
+    (set-field! parent (find-object oid) v))
   
   (create-object! $nothing))
 
-
-
-
+(provide db@)
