@@ -1,47 +1,8 @@
 # deepika
 Wannabe spiritual successor to LambdaMOO.
 
-## Overview
-This is very much a work in progress. The following stuff is *blissfully* implemented:
+# overview
+**Deepika** is a **LambdaMOO** clone that is designed mostly for educational purposes. It is designed to be run in a **Racket** environment but all of the concepts can be translated to your programming language of choice.
 
-* basic database (`db-sig.rkt` and `db-unit.rkt`)
-* task queue (`task-queue.rkt`)
-* command parser (`parser.rkt` and `parser-test.rkt`)
-* common infrastructure such as `objid` and friends (`common.rkt`)
-* **very basic** VM (`vm.rkt`)
-
-## Quick start
-The object database `unit` is more or less functional although it isn't really hooked up to anything just yet.
-```
-> (define-values/invoke-unit/infer db@)
-> (create-object! $nothing)        
-(objid 1)
-> (create-object! $nothing)        
-(objid 2)
-> (objects)                        
-(list (objid 1) (objid 2))
-> (get-contents (objid 1))         
-(set)
-> (set-location! (objid 2) (objid 1))
-> (get-contents (objid 1))
-(set (objid 2))
-> (get-location (objid 2))
-(objid 1)
-```
-
-The VM can barely walk although it *is* able to execute built-in procedures. There are two example procedures in `VM.rkt` that more or less show how it is going to be used in the future (the API *will* change though).
-
-In the next example we assume that a `notify` function is in scope. In this case it is defined like this:
-```
-(define (notify x)
-  (displayln (string-append "frotz: " x)))
-```
-
-We can play around with the VM by pushing (and popping) values and executing instructions:
-
-```
-> (push! notify)                            ; built-in functiion
-> (push! (list "Hello from Deepika~!"))     ; arguments
-> (call-bi!)                                ; instruction
-frotz: Hello from Deepika~!
-```
+# rationale
+**Deepika** goes a bit deeper than most toy VM implementations. Since it is modelled on **LambdaMOO** we have a very dynamic environment that includes objects and tasks that can be forked and suspended. Additionally, we can set quota on execution time and *ticks* of these tasks in order to prevent rogue programs from monopolizing the server. On top of that, any decent MOO has a TCP interface in order for remote clients to actually interact with the server. A **MOO** basically has all of the above so it's an excellent venue to explore a language, its libraries and its ecosystem.
