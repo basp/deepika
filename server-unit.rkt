@@ -78,11 +78,19 @@
       (close-input-port I)
       (close-output-port O))
     (match (thread-try-receive)
-      ['disconnect (close-connection)]
+      ; check the mailbox for any requests (most likely from the server)
+      ['disconnect
+       ; server wants us to disconnect so we'll close the connection
+       ; TODO: display *nice* message prior to disconnecting
+       (close-connection)]
       [#f
+       ; server is still up for it and this client has no more requests pending
        (if (eof-object? cmd)
-        (close-connection)
+           ; client doesn't want us anymore :'(
+           (close-connection)
+        ; client send in some data (hopefully a command) that we ned to execute
         (begin
+          ; this is just a stub implementation for now
           (displayln (string-append "> " cmd) O)
           (displayln "OK." O)
           (flush-output O)
