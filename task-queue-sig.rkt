@@ -4,8 +4,9 @@
 
 (define-signature task-queue^
   ((contracted
-    [task-start (-> integer? procedure?)]
-    [task-kill (-> task-id?)]
-    [task-list (-> (listof any/c))])))
+    [task-start (-> integer? procedure? taskid?)]
+    [task-kill (-> taskid? any/c)]
+    [task-ready? (-> taskid? boolean?)]
+    [task-list (-> (listof taskid?))])))
 
 (provide task-queue^)
