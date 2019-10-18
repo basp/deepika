@@ -104,13 +104,13 @@
   (define (get-props oid)
     (set->list (get-field props (find-object oid))))
 
-  (define (add-prop oid v)
+  (define (add-prop! oid v)
     (define obj (find-object oid))
     (define old-vs (get-field props obj))
     (define new-vs (set-add old-vs v))
     (set-field! props obj new-vs))
 
-  (define (add-verb oid v)
+  (define (add-verb! oid v)
     (define obj (find-object oid))
     (define old-vs (get-field verbs obj))
     (define new-vs (set-add old-vs v))

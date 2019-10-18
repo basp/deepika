@@ -40,6 +40,9 @@
   
   (define (main)
     (match (thread-receive)
+      ; this is just a toy implementation that allows us to make sure the
+      ; server is well-behaved and that other subsystems behave as well.
+      ; wip
       ['connections
        (for/list ([c (hash-keys connections)])
          (displayln c))
@@ -108,6 +111,7 @@
       (close-connections)
       ; 3. finish remaining tasks
       ; 4. serialize the database
+      ; 5. exit the main loop
       (displayln "OK."))))
 
 (provide server@)

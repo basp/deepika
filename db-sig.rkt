@@ -23,8 +23,8 @@
     [get-children (-> valid? set?)]
     [get-verbs (-> valid? (listof verb?))]
     [get-props (-> valid? (listof prop?))]
-    [add-prop (-> valid? prop? void?)]
-    [add-verb (-> valid? verb? void?)]
+    [add-prop! (-> valid? prop? void?)]
+    [add-verb! (-> valid? verb? void?)]
     [objects (-> (listof valid?))]
     [for/objects (-> procedure? void?)])))
 
