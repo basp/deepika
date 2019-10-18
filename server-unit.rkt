@@ -88,8 +88,8 @@
        (if (eof-object? cmd)
            ; client doesn't want us anymore :'(
            (close-connection)
-        ; client send in some data (hopefully a command)
         (begin
+          ; client send in some data (hopefully a command)
           ; TODO: actual implementation
           (displayln (string-append "> " cmd) O)
           (displayln "OK." O)
