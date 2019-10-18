@@ -19,7 +19,7 @@
   (define (next-id)
     (add1 (max-id)))
   
-  (define (task-start delay proc)
+  (define (task-start! delay proc)
     (let* ([id (next-id)]
            [tid (taskid id)]
            [t (task tid (+ (current-seconds) delay) proc)])
@@ -33,9 +33,11 @@
             (<= (task-start-time t) (current-seconds)))]
       [x x]))
 
-  (define (task-kill tid)
+  (define (task-remove! tid)
     (hash-remove! tasks (taskid-id tid)))
 
   (define (task-list)
-    (map (λ (x) (taskid x)) (hash-keys tasks))))
-  
+    (map (λ (x) (taskid x)) (hash-keys tasks)))
+
+  (define (task-list/ready)
+    (filter task-ready? (task-list))))
