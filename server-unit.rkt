@@ -81,16 +81,16 @@
       ; check the mailbox for any requests (most likely from the server)
       ['disconnect
        ; server wants us to disconnect so we'll close the connection
-       ; TODO: display *nice* message prior to disconnecting
+       ; TODO: display message prior to disconnecting
        (close-connection)]
       [#f
        ; server is still up for it and this client has no more requests pending
        (if (eof-object? cmd)
            ; client doesn't want us anymore :'(
            (close-connection)
-        ; client send in some data (hopefully a command) that we ned to execute
+        ; client send in some data (hopefully a command)
         (begin
-          ; this is just a stub implementation for now
+          ; TODO: actual implementation
           (displayln (string-append "> " cmd) O)
           (displayln "OK." O)
           (flush-output O)
