@@ -17,7 +17,7 @@
   (set! stack (cdr stack))
   x)
 
-(define (push/get-var! name env)
+(define (push/ref-var! name env)
   (push! (hash-ref env name)))
 
 (define (pop/set-var! name env)

@@ -1,6 +1,7 @@
 #lang racket/base
 
 (struct objid (id) #:transparent)
+(struct task-id (id) #:transparent)
 (struct prop (name val) #:transparent)
 (struct verb (name proc) #:transparent)
 
