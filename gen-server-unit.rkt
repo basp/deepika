@@ -1,32 +1,7 @@
 #lang racket
 
-(define-signature gen-server^
-  (start
-   stop
-   call
-   cast))
-
-(define-signature gen-server-handlers^
-  (init          ; any/c -> any/c
-   terminate     ; any/c -> void?
-   handle-call   ; any/c -> any/c
-   handle-cast)) ; any/c -> void?
-
-(define-unit gen-server-handlers@
-  (import)
-  (export gen-server-handlers^)
-
-  (define (init args)
-    (list 'ok null)) 
-
-  (define (terminate state)
-    (void))
-  
-  (define (handle-call req)
-    req)
-
-  (define (handle-cast req)
-    (displayln "cast")))
+(require "gen-server-handlers-sig.rkt"
+         "gen-server-sig.rkt")
 
 (define-unit gen-server@
   (import gen-server-handlers^)
@@ -68,38 +43,11 @@
   (define (stop)
     (thread-send thd 'stop))
 
-  ; any/c -> any/c
   (define (call req)
     (thread-send thd (list 'call (current-thread) req))
     (thread-receive))
 
-  ; any/c -> void?
   (define (cast req)
     (thread-send thd (list 'cast req))))
 
-;(define-values/invoke-unit/infer gen-server-handlers@)
-;(define-values/invoke-unit/infer gen-server@)
-
-(define-unit ping@
-  (import)
-  (export gen-server-handlers^)
-
-  (define (init args)
-    (list 'ok null))
-
-  (define (terminate state)
-    (void))
-
-  (define (handle-cast req)
-    (void))
-
-  (define (handle-call req)
-    (match req
-      ['ping 'pong]
-      [_  (void)])))
-  
-
-
-
-
-
+(provide gen-server@)
