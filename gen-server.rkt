@@ -10,21 +10,23 @@
   (init          ; any/c -> any/c
    terminate     ; any/c -> void?
    handle-call   ; any/c -> any/c
-   handle-cast   ; any/c -> void?))
+   handle-cast)) ; any/c -> void?
 
 (define-unit gen-server-handlers@
   (import)
   (export gen-server-handlers^)
 
-  (define (init args) (list 'ok null)) 
+  (define (init args)
+    (list 'ok null)) 
 
-  (define (terminate state) (void))
+  (define (terminate state)
+    (void))
   
   (define (handle-call req)
-    req))  
+    req)
 
   (define (handle-cast req)
-    (displayln "cast"))
+    (displayln "cast")))
 
 (define-unit gen-server@
   (import gen-server-handlers^)
@@ -49,8 +51,6 @@
       [(list 'start state)
        (loop state)]
       [(list 'call from _)
-       ; send *something* back to avoid block
-       ; the from thread for no good reason
        (thread-send from 'idle)
        (idle state)]
       [_
@@ -77,5 +77,29 @@
   (define (cast req)
     (thread-send thd (list 'cast req))))
 
-(define-values/invoke-unit/infer gen-server-handlers@)
-(define-values/invoke-unit/infer gen-server@)
+;(define-values/invoke-unit/infer gen-server-handlers@)
+;(define-values/invoke-unit/infer gen-server@)
+
+(define-unit ping@
+  (import)
+  (export gen-server-handlers^)
+
+  (define (init args)
+    (list 'ok null))
+
+  (define (terminate state)
+    (void))
+
+  (define (handle-cast req)
+    (void))
+
+  (define (handle-call req)
+    (match req
+      ['ping 'pong]
+      [_  (void)])))
+  
+
+
+
+
+
