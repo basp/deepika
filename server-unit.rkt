@@ -1,6 +1,10 @@
-#lang racket
+#lang racket/base
 
-(require "common.rkt"
+(require racket/unit
+         racket/match
+         racket/tcp
+         racket/class
+         "common.rkt"
          "server-sig.rkt"
          "db-sig.rkt")
 
@@ -30,19 +34,20 @@
 ; the server to any clients (mostly tasks and connection handlers) that want
 ; access to server related functionality.
 
+(define client%
+  (class object%
+    (init-field thread socket)
+    (field [player $nothing])
+    (super-new)))
+
 (define-unit server@
   (import db^)
   (export server^)
-
-  (struct socket (in out) #:transparent)
 
   (define connections (make-hasheq))
   
   (define (main)
     (match (thread-receive)
-      ; this is just a toy implementation that allows us to make sure the
-      ; server is well-behaved and that other subsystems behave as well.
-      ; wip
       ['connections
        (for/list ([c (hash-keys connections)])
          (displayln c))
@@ -72,33 +77,29 @@
 
   (define (handle s)
     (define-values (I O) (values (socket-in s) (socket-out s)))
+    ; this should probably not go outside of the polling loop
     (define cmd (read-line I 'return-linefeed))
     (define (close-connection)
       (hash-remove! connections s)
       (close-input-port I)
       (close-output-port O))
     (match (thread-try-receive)
-      ; check the mailbox for any requests (most likely from the server)
-      ['disconnect
-       ; server wants us to disconnect so we'll close the connection
-       ; TODO: display message prior to disconnecting
+      [(list 'disconnect)
        (close-connection)]
+      [(list 'notify msg)
+       (displayln msg O)]
       [#f
-       ; server is still up for it and this client has no more requests pending
        (if (eof-object? cmd)
-           ; client doesn't want us anymore :'(
            (close-connection)
-        (begin
-          ; client send in some data (hopefully a command)
-          ; TODO: actual implementation
-          (displayln (string-append "> " cmd) O)
-          (displayln "OK." O)
-          (flush-output O)
-          (handle s)))]))
+           (begin
+             (displayln (string-append "> " cmd) O)
+             (displayln "OK." O)
+             (flush-output O)
+             (handle s)))]))
 
   (define (close-connections)
     (for/list ([t (hash-values connections)])
-      (thread-send t 'disconnect)))
+      (thread-send t (list 'disconnect))))
   
   (define main-thread
     (thread
@@ -112,7 +113,6 @@
     (define stop-listening (start-listening 7777))
     (lambda ()
       (displayln "Shutdown sequence initiated.")
-      ; shutdown sequence:
       ; 1. stop listening for incoming connections (stop-listening)
       (stop-listening)
       ; 2. close all existing connections

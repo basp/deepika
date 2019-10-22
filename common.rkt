@@ -4,6 +4,7 @@
 (struct taskid (id) #:transparent)
 (struct prop (name val) #:transparent)
 (struct verb (name proc) #:transparent)
+(struct socket (in out) #:transparent)
 
 (define $nothing (objid -1))
 (define $ambiguous-match (objid -2))

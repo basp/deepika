@@ -1,4 +1,7 @@
-#lang racket
+#lang racket/base
+
+(require racket/unit
+         racket/contract)
 
 (define-signature server^
   ((contracted
