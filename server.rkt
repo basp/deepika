@@ -102,5 +102,11 @@
 (define-values/invoke-unit/infer db@)
 (define-values/invoke-unit/infer server+callbacks@)
 
-(define (notify who msg)
+(define (tell who msg)
   (cast (list 'notify who msg)))
+
+(define notify tell)
+
+(define (wall msg)
+  (for/list ([x (hash-keys (call 'clients))])
+    (tell x msg)))

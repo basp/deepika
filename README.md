@@ -1,6 +1,7 @@
 deepika
 =======
 ```
+(define me (first (hash-keys (call 'clients))))
 (for/list ([x (hash-keys (call 'clients))]) 
-    (notify me-socket (~a x)))
+    (notify me (~a x)))
 ```
