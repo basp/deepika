@@ -1,13 +1,13 @@
 #lang racket
 
-(define client%
-  (class object%
-    (init-field socket)
-    (define/public (start)
-      #f)
-    (super-new)))
+; start -> init
+; stop -> terminate
+; cast -> handle cast
+; call -> handle call
 
-(define server%
-  (class object%
-    (super-new)))
+(define-signature gen-server^
+  (start    
+   stop
+   cast
+   call))
 
