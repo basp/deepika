@@ -1,9 +1,9 @@
 #lang racket
 
 (require "common.rkt"
-         "gen-server-callbacks-sig.rkt"
-         "gen-server-sig.rkt"
-         "gen-server-unit.rkt"
+         "server-callbacks-sig.rkt"
+         "server-sig.rkt"
+         "server-unit.rkt"
          "db-sig.rkt"
          "db-unit.rkt"
          "parser.rkt")
@@ -15,8 +15,8 @@
     (super-new)))
 
 (define-unit server-callbacks@
-  (import gen-server^ db^)
-  (export gen-server-callbacks^)
+  (import server^ db^)
+  (export server-callbacks^)
 
   (struct socket (in out obj) #:transparent)
 
@@ -96,8 +96,8 @@
 
 (define-compound-unit/infer server+callbacks@
   (import db^)
-  (export gen-server^ gen-server-callbacks^)
-  (link gen-server@ server-callbacks@))
+  (export server^ server-callbacks^)
+  (link server@ server-callbacks@))
 
 (define-values/invoke-unit/infer db@)
 (define-values/invoke-unit/infer server+callbacks@)

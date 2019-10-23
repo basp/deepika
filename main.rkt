@@ -7,9 +7,6 @@
 (module+ test
   (require rackunit))
 
-(define-values/invoke-unit/infer db@)
-(define-values/invoke-unit/infer server@)
-
 (module+ test
   ;; Any code in this `test` submodule runs when this file is run using DrRacket
   ;; or with `raco test`. The code here does not run when this file is
