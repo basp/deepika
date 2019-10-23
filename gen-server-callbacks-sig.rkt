@@ -1,9 +1,9 @@
 #lang racket
 
-(define-signature gen-server-handlers^
+(define-signature gen-server-callbacks^
   (init
    terminate
    handle-cast
    handle-call))
 
-(provide gen-server-handlers^)
+(provide gen-server-callbacks^)

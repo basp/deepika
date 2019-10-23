@@ -1,10 +1,10 @@
 #lang racket
 
-(require "gen-server-handlers-sig.rkt"
+(require "gen-server-callbacks-sig.rkt"
          "gen-server-sig.rkt")
 
 (define-unit gen-server@
-  (import gen-server-handlers^)
+  (import gen-server-callbacks^)
   (export gen-server^)
 
   (define (loop state)

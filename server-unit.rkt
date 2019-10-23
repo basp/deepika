@@ -1,66 +1,29 @@
-#lang racket/base
+#lang racket
 
-(require racket/unit
-         racket/match
-         racket/tcp
-         racket/class
-         "common.rkt"
-         "server-sig.rkt"
-         "db-sig.rkt")
+(require "common.rkt"
+         "gen-server-callbacks-sig.rkt"
+         "gen-server-sig.rkt"
+         "gen-server-unit.rkt"
+         "db-sig.rkt"
+         "db-unit.rkt"
+         "parser.rkt")
 
-; The server has two main threads:
-; - The main loop where all the important stuff is happening (the kernel).
-; - A listener thread that will listen for incoming connections this thread is
-;   spawned by the main loop.
-; 
-; In addition to that, the listener thread will spawn a worker thread that runs
-; during the lifetime of each client connection. This worker thread is mainly
-; responsible for dealing with input from the client. However, it might be also
-; a good place to do some initial work before handing it off to the server or
-; kernel (like parsing commands for example).
-;
-; Since all threads want access to the kernel we have to find a way to give it
-; to them in a reasonable way. In case of the main loop this is a non-issue
-; since that thread is explicitly responsible for managing all the resources.
-;
-; The only way other threads influence the main thread is by sending a message
-; to its mailbox. The server will inspect the mailbox every frame and deal with
-; any incoming requests. Although we could pass along the server thread to all
-; other threads directly it might be nicer to abstract this as a kernel% class.
-;
-; TODO:
-; Design kernel% class as an abstraction to database, built-in functions, task
-; queue and other server/environment related stuff. This class should represent
-; the server to any clients (mostly tasks and connection handlers) that want
-; access to server related functionality.
-
-(define client%
+(define socket%
   (class object%
-    (init-field thread socket)
-    (field [player $nothing])
+    (init-field in out)
+    (field [obj $nothing])
     (super-new)))
 
-(define-unit server@
-  (import db^)
-  (export server^)
+(define-unit server-callbacks@
+  (import gen-server^ db^)
+  (export gen-server-callbacks^)
 
-  (define connections (make-hasheq))
-  
-  (define (main)
-    (match (thread-receive)
-      ['connections
-       (for/list ([c (hash-keys connections)])
-         (displayln c))
-       (flush-output)
-       (main)]
-      [x #:when (number? x)
-         (displayln "a number")
-         (main)]
-      [x (displayln "something else")
-         (main)]))
+  (struct socket (in out obj) #:transparent)
 
-  (define (start-listening port-no)
-    (define listener (tcp-listen port-no))
+  (define clients (make-hasheq))
+
+  (define (serve port-no)
+    (define listener (tcp-listen port-no 5 #t))
     (define (loop)
       (accept-and-handle listener)
       (loop))
@@ -71,74 +34,73 @@
 
   (define (accept-and-handle listener)
     (define-values (I O) (tcp-accept listener))
-    (define s (socket I O))
-    (define handler (thread (lambda () (handle s))))
-    (hash-set! connections s handler))
-
+    (define s (socket I O $nothing))
+    (define t (thread (lambda () (handle s))))
+    (hash-set! clients s t))
+ 
   (define (handle s)
     (define-values (I O) (values (socket-in s) (socket-out s)))
-    ; this should probably not go outside of the polling loop
-    (define cmd (read-line I 'return-linefeed))
+    
+    (define (syntax-error e) (displayln 'syntax-error O))
+    
     (define (close-connection)
-      (hash-remove! connections s)
+      (hash-remove! clients s)
       (close-input-port I)
       (close-output-port O))
-    (match (thread-try-receive)
-      [(list 'disconnect)
+    
+    (define evt (sync (read-line-evt I 'any)
+                      (thread-receive-evt)))
+    
+    (match evt
+      [eof #:when (eof-object? eof)
        (close-connection)]
-      [(list 'notify msg)
-       (displayln msg O)]
-      [#f
-       (if (eof-object? cmd)
-           (close-connection)
-           (begin
-             (displayln (string-append "> " cmd) O)
-             (displayln "OK." O)
-             (flush-output O)
-             (handle s)))]))
+      [cmd #:when (string? cmd)
+       (with-handlers ([exn:fail? syntax-error])
+         (let ([res (eval (read (open-input-string cmd)))])
+           (displayln res O)))
+       (flush-output O)
+       (handle s)]
+      [else
+       (match (thread-receive)
+         [(list 'disconnect)
+          (close-connection)]
+         [(list 'notify msg)
+          (displayln msg O)
+          (flush-output O)
+          (handle s)])]))
+   
+  (define (init args)
+    (match args
+      [(list port-no)
+       #:when (integer? port-no)
+       (let ([s (serve port-no)])
+         (list 'ok s))]
+      [else
+       (list 'invalid-start-args else)]))
 
-  (define (close-connections)
-    (for/list ([t (hash-values connections)])
-      (thread-send t (list 'disconnect))))
-  
-  (define main-thread
-    (thread
-     (lambda ()
-       ((main)))))
+  (define (terminate state)
+    (void))
 
-  (define (server-test x)
-    (thread-send main-thread x))
-  
-  (define (server-start)
-    (define stop-listening (start-listening 7777))
-    (lambda ()
-      (displayln "Shutdown sequence initiated.")
-      ; 1. stop listening for incoming connections (stop-listening)
-      (stop-listening)
-      ; 2. close all existing connections
-      (close-connections)
-      ; 3. finish remaining tasks
-      ; 4. serialize the database
-      ; 5. exit the main loop
-      (displayln "OK."))))
+  (define (handle-cast req)
+    (match req
+      [(list 'notify who msg)
+       #:when (and (string? msg) (socket? who))
+       (let ([t (hash-ref clients who)])
+         (thread-send t (list 'notify msg)))]
+      [else (void)]))
 
-(provide server@)
+  (define (handle-call req)
+    (match req
+      ['clients clients]
+      [else else])))
 
+(define-compound-unit/infer server+callbacks@
+  (import db^)
+  (export gen-server^ gen-server-callbacks^)
+  (link gen-server@ server-callbacks@))
 
+(define-values/invoke-unit/infer db@)
+(define-values/invoke-unit/infer server+callbacks@)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+(define (notify who msg)
+  (cast (list 'notify who msg)))
