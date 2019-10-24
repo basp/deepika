@@ -7,8 +7,6 @@
 
 (struct objid (num) #:prefab)
 
-(struct prop (name value info) #:transparent)
-
 (define $system (objid 0))
 (define $nothing (objid -1))
 (define $ambiguous-match (objid -2))
@@ -31,6 +29,23 @@
 (define (failed-match? x)
   (equal? x $failed-match))
 
+(struct prop (name value info) #:transparent)
+
+(define db:property%
+  (class object%
+    (init-field name
+                [value $nothing]
+                [info null])
+    (super-new)))
+
+(define db:verb%
+  (class object%
+    (init-field desc)
+    (field [owner $nothing])
+    (field [args null])
+    (field [prog null])
+    (super-new)))
+
 (define db:object%
   (class object%
     (init-field id
@@ -52,7 +67,7 @@
     (match obj
       [x #:when (nothing? x) (void)]
       [x (let* ([set (dynamic-get-field field-name x)]
-                [args (list set x)])
+                [args (list set oid)])
            (apply op args))]))
   (exec-set-op set-remove! from)
   (exec-set-op set-add! to))
@@ -62,6 +77,15 @@
   (match (hash-has-key? idx k)
     [#t (hash-ref idx k)]
     [_ $nothing]))
+
+(define (find-property oid name)
+  (match (find-object oid)
+    [x #:when (nothing? x)
+       $nothing]
+    [x (let ([h (get-field props x)])
+         (if (hash-has-key? h name)
+             (hash-ref h name)
+             $nothing))]))
 
 (define (max-object-id)
   (match (hash-keys idx)
@@ -111,35 +135,58 @@
   (set-field! parent (find-object oid) new-parent))
 
 (define (get-contents oid)
-  (get-field contents (find-object oid)))
+  (set->list (get-field contents (find-object oid))))
 
 (define (get-children oid)
-  (get-field children (find-object oid)))
+  (set->list (get-field children (find-object oid))))
 
 (define (get-props oid)
-  (get-field props (find-object oid)))
+  (hash-keys (get-field props (find-object oid))))
 
-(define (add-prop oid name value [info null])
-  (define p (prop name value info))
+(define (add-prop! oid name value [info null])
+  (define p (new db:property%
+                 [name name]
+                 [value value]
+                 [info info]))
   (define o (find-object oid))
   (define h (get-field props o))
   (if (hash-has-key? h name)
       (error 'E_INVARG)
       (hash-set! h name p)))
 
-(define (remove-prop oid name)
+(define (remove-prop! oid name)
   (define o (find-object oid))
   (define h (get-field props o))
   (if (hash-has-key? h name)
       (hash-remove! h name)
       (error 'E_PROPNF)))
 
+(define (get-prop-value oid name)
+  (match (find-property oid name)
+    [x #:when (nothing? x)
+       $nothing]
+    [x (get-field value x)]))
+
+(define (set-prop-value! oid name v)
+  (match (find-property oid name)
+    [x #:when (nothing? x)
+       $nothing]
+    [x (set-field! value x v)
+       oid]))
+
 (define (objects)
   (filter valid? (map (λ (x) (number->objid x))
                       (hash-keys idx))))
 
 (provide
+ objid?
+ objid
+ $nothing
+ $ambiguous-match
+ $failed-match
  (contract-out
+  [number->objid (-> integer? objid?)]
+  [objid->number (-> objid? integer?)]
   [valid? (-> any/c boolean?)]
   [valid+? (-> any/c boolean?)]
   [create-object! (->* () (valid+?) valid?)]
@@ -152,7 +199,8 @@
   [set-location! (-> valid? valid+? any)]
   [get-contents (-> valid? (listof valid?))]
   [get-children (-> valid? (listof valid?))]
-  [get-props (-> valid? (listof prop?))]
-  [add-prop (-> valid? string? any/c any)]
-  [remove-prop (-> valid? string? any)]
+  [get-props (-> valid? (listof string?))]
+  [add-prop! (-> valid? string? any/c any)]
+  [remove-prop! (-> valid? string? any)]
+  [set-prop-value! (-> valid? string? any/c any)]
   [objects (-> (listof valid?))]))
