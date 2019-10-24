@@ -49,12 +49,14 @@
       (close-output-port O))
     
     (define evt (sync (read-line-evt I 'any)
-                      (thread-receive-evt)))
-    
+                      (thread-receive-evt)))    
+
     (match evt
-      [eof #:when (eof-object? eof)
+      [eof
+       #:when (eof-object? eof)
        (close-connection)]
-      [cmd #:when (string? cmd)
+      [cmd
+       #:when (string? cmd)
        (with-handlers ([exn:fail? syntax-error])
          (let ([res (eval (read (open-input-string cmd)))])
            (displayln res O)))
@@ -77,7 +79,7 @@
          (list 'ok s))]
       [else
        (list 'invalid-start-args else)]))
-
+  
   (define (terminate state)
     (void))
 
