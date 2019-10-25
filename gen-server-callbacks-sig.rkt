@@ -1,4 +1,6 @@
-#lang racket
+#lang racket/base
+
+(require racket/unit)
 
 (define-signature gen-server-callbacks^
   (init

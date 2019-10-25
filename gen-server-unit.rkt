@@ -1,6 +1,9 @@
-#lang racket
+#lang racket/base
 
-(require "gen-server-callbacks-sig.rkt"
+(require racket/unit
+         racket/match
+         racket/format
+         "gen-server-callbacks-sig.rkt"
          "gen-server-sig.rkt")
 
 (define-unit gen-server@
