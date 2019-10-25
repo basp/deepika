@@ -17,11 +17,37 @@
 @title{Deepika}
 @author{basp}
 
-Deepika is a MOO in the spirit of LambdaMOO.
+Deepika is a MOO in the spirit of LambdaMOO. MOO stands for MUD object oriented.
+MUD stands for multi-user domain. It is the predecessor to what we nowadays call
+an MMO. A MOO is a multi-user domain object oriented environment.
 
 @table-of-contents[]
 
-@section{Database}
+@section{Overview}
+
+Using the original LambdaMOO as a reference, we can typically divide a MOO into
+a few key components. At the very core is a TCP server that is not unlike a
+typical chat server. It reads lines of text and it sends lines of text.
+Unlike a chat server, a MOO server has a world state which is represented as 
+a database of objects. Clients (i.e. players) are part of this state and 
+represented by objects as well.
+
+And even though nowadays most chat servers will do some amount of parsing or
+basic text replacement, a MOO has a command parser with a simple but 
+surprisingly powerful syntax and evaluation behavior. In short, it will accept
+natural language (English) commands and match them to executable
+code (called verbs) in the object database.
+
+When you consider that this player invoked code can create objects, destroy or
+relocate them, add properties or verbs (executable code) and manipulate their
+values, it is apparent that this leads to a very dynamic environment.
+
+@section{Reference}
+
+This section is an overview of the public interface provided by the modules
+that make up @racket[deepika].
+
+@subsection{Database}
 @defmodule[deepika/db]
 
 The database module is responsible for persisting the state of the world. In our
@@ -36,6 +62,7 @@ case, the world consists mainly of three things: objects, properties and verbs.
     Returns @racket[#t] if @racket[x] is @racket[$nothing].
 }
 
+@subsubsection{Objects}
 @defproc[(objid? [x any/c]) boolean?]{
     Returns @racket[#t] if @racket[x] is an object id and @racket[#f] otherwise.
 
@@ -143,7 +170,13 @@ not @racket[valid?] nor @racket[valid+?].
     @racket[new-location].
 }
 
-@section{Tasks}
+@subsubsection{Properties}
+TODO
+
+@subsubsection{Verbs}
+TODO
+
+@subsection{Tasks}
 @defmodule[deepika/tasks]
 
 Note that the tasks module does not actually execute any tasks. Instead, it is
@@ -158,7 +191,7 @@ queued and ready to run is solely up to the client of this module.
     Returns the id of the task given by @racket[x].
 }
 
-@defproc[(task-thunk [x task?]) procedure?]{
+@defproc[(task-th [x task?]) procedure?]{
     Returns the @italic{thunk} of the task given by @racket[x].
 }
 
@@ -167,7 +200,7 @@ queued and ready to run is solely up to the client of this module.
     there is a task with specified @racket[id].
 }
 
-@defproc[(task-start! [del integer?] [thunk procedure?]) task/valid?]{
+@defproc[(task-start! [del integer?] [th procedure?]) task/valid?]{
     Queues @racket[thunk] as a new task to start after @racket[del] seconds 
     have elapsed. The result of this function is the id of the queued task.
 }
@@ -218,7 +251,7 @@ as well.
     (i.e. when @racket[task-ready?] returns @racket[#t]).
 }
 
-@section{Parser}
+@subsection{Parser}
 @defmodule[deepika/parser]
 
 @defproc[(parse/args [s string?]) (listof string?)]{
