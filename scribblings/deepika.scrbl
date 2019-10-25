@@ -36,11 +36,6 @@ case, the world consists mainly of three things: objects, properties and verbs.
     Returns @racket[#t] if @racket[x] is @racket[$nothing].
 }
 
-@defthing[objid objid?]{
-    An object id is just a simple wrapper around an integer. 
-    We need these to keep them apart from regular integer values.    
-}
-
 @defproc[(objid? [x any/c]) boolean?]{
     Returns @racket[#t] if @racket[x] is an object id and @racket[#f] otherwise.
 
@@ -155,33 +150,72 @@ Note that the tasks module does not actually execute any tasks. Instead, it is
 merely a storage device and as such, actual execution of the tasks that are
 queued and ready to run is solely up to the client of this module.
 
-@defproc[(task-start! [del integer?] [proc procedure?]) integer?]{
-    Queues @racket[proc] as a new task to start after @racket[del] seconds have
-    elapsed. The result of this function is the id of the queued task.
+@defproc[(task? [x any/c]) boolean?]{
+    Returns @racket[#t] if @racket[x] is a task structure.
 }
 
-@defproc[(task-ready? [id integer?]) boolean?]{
+@defproc[(task-id [x task?]) integer?]{
+    Returns the id of the task given by @racket[x].
+}
+
+@defproc[(task-thunk [x task?]) procedure?]{
+    Returns the @italic{thunk} of the task given by @racket[x].
+}
+
+@defproc[(task/valid? [id integer?]) boolean?]{
+    Like @racket[valid?] but for tasks instead. It will return @racket[#t] if
+    there is a task with specified @racket[id].
+}
+
+@defproc[(task-start! [del integer?] [thunk procedure?]) task/valid?]{
+    Queues @racket[thunk] as a new task to start after @racket[del] seconds 
+    have elapsed. The result of this function is the id of the queued task.
+}
+
+@defproc[(task-ready? [id task/valid?]) boolean?]{
     Returns @racket[#t] if the task specified by @racket[id] is ready to run.
 }
 
 @examples[
     #:eval my-evaluator
     (define tid (task-start! 5 (λ () (displayln "Go!"))))
+    tid
     (task-ready? tid)
     (sleep 5)
     (task-ready? tid)]
 
-@defproc[(task-remove! [id integer?]) any]{
+@defproc[(task-remove! [id task/valid?]) any]{
     Irrevocably removes the task specified by @racket[id] from the queue. It 
     will not be executed.
 }
 
-@defproc[(tasks) (listof integer?)]{
+@defproc[(get-task [id task/valid?]) task?]{
+    Returns the task data associated with task @racket[id]. The result can be
+    queried with @racket[task-id] and @racket[task-proc].
+}
+
+@defproc[(tasks) (listof task/valid?)]{
     Returns a list of ids of all tasks currently on the queue.
 }
 
-@defproc[(tasks/ready) (listof integer?)]{
-    Like @racket[tasks] but returns only those tasks that are ready to run.
+@examples[
+    #:eval my-evaluator
+    (define tid (task-start! 30 (λ () (displayln "Uhmmm..."))))
+    tid
+    (task/valid? tid)
+    (tasks)
+    (task-remove! tid)
+    (task/valid? tid)
+    (tasks)    
+]
+
+Note that the queue will never remove tasks unless it is explicitly asked to do 
+so. That's why the latent task of the previous example shows up in this example
+as well.
+
+@defproc[(tasks/ready) (listof task/valid?)]{
+    Like @racket[tasks] but returns only those tasks that are ready to run 
+    (i.e. when @racket[task-ready?] returns @racket[#t]).
 }
 
 @section{Parser}
@@ -191,6 +225,8 @@ queued and ready to run is solely up to the client of this module.
     Parses a string into arguments. This tokenizes the string on whitespace and
     treats quoted strings as one token.
 }
+
+For example, the result of the following expression is @racket[#t]:
 
 @racketblock[
     (equal? (parse/args "foo \"bar quux\" frotz")

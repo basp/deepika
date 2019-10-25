@@ -4,7 +4,7 @@
          racket/contract
          "common.rkt")
 
-(struct task (id start-time proc) #:transparent)
+(struct task (id start-time thunk))
 
 (define idx (make-hash))
 
@@ -20,9 +20,9 @@
 (define (get-task id)
   (hash-ref idx id))
 
-(define (task-start! del proc)
+(define (task-start! del thunk)
   (let* ([id (next-task-id)]
-         [t (task id (+ (current-seconds) del) proc)])
+         [t (task id (+ (current-seconds) del) thunk)])
     (hash-set! idx id t)
     id))
 
@@ -41,6 +41,9 @@
 
 (provide
  (contract-out
+  [task? (-> any/c boolean?)]
+  [task-id (-> task? integer?)]
+  [task-thunk (-> task? procedure?)]
   [task/valid? (-> integer? boolean?)]
   [task-start! (-> integer? procedure? task/valid?)]
   [task-ready? (-> task/valid? boolean?)]
