@@ -1,11 +1,11 @@
 #lang racket
 
-(require "server-callbacks-sig.rkt"
-         "server-sig.rkt")
+(require "gen-server-callbacks-sig.rkt"
+         "gen-server-sig.rkt")
 
-(define-unit server@
-  (import server-callbacks^)
-  (export server^)
+(define-unit gen-server@
+  (import gen-server-callbacks^)
+  (export gen-server^)
 
   (define (loop state)
     (match (thread-receive)
@@ -50,4 +50,4 @@
   (define (cast req)
     (thread-send thd (list 'cast req))))
 
-(provide server@)
+(provide gen-server@)

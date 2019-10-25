@@ -1,11 +1,9 @@
 #lang racket
 
-(require "common.rkt"
-         "server-callbacks-sig.rkt"
-         "server-sig.rkt"
-         "server-unit.rkt"
-         "db-sig.rkt"
-         "db-unit.rkt"
+(require "gen-server-callbacks-sig.rkt"
+         "gen-server-sig.rkt"
+         "gen-server-unit.rkt"
+         "db.rkt"
          "parser.rkt")
 
 (define socket%
@@ -15,8 +13,8 @@
     (super-new)))
 
 (define-unit server-callbacks@
-  (import server^ db^)
-  (export server-callbacks^)
+  (import gen-server^)
+  (export gen-server-callbacks^)
 
   (struct socket (in out obj) #:transparent)
 
@@ -97,17 +95,14 @@
       [else else])))
 
 (define-compound-unit/infer server+callbacks@
-  (import db^)
-  (export server^ server-callbacks^)
-  (link server@ server-callbacks@))
+  (import)
+  (export gen-server^ gen-server-callbacks^)
+  (link gen-server@ server-callbacks@))
 
-(define-values/invoke-unit/infer db@)
 (define-values/invoke-unit/infer server+callbacks@)
 
 (define (tell who msg)
   (cast (list 'notify who msg)))
-
-(define notify tell)
 
 (define (wall msg)
   (for/list ([x (hash-keys (call 'clients))])
