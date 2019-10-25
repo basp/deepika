@@ -1,16 +1,18 @@
 #lang scribble/manual
-@(require (@for-label racket)
-          "../parser.rkt"
-          "../db.rkt"
-          scribble/example
-          racket/sandbox)
+@(require (@for-label)
+            "../parser.rkt"
+            "../db.rkt"
+            "../tasks.rkt"
+            racket
+            racket/sandbox
+            scribble/example)
 
 @(define my-evaluator
    (parameterize ([sandbox-output 'string]
                   [sandbox-error-output 'string]
                   [sandbox-memory-limit 50])
      (make-evaluator 'racket
-        #:requires (list "db.rkt"))))
+        #:requires (list "db.rkt" "tasks.rkt"))))
 
 @title{Deepika}
 @author{basp}
@@ -149,7 +151,11 @@ not @racket[valid?] nor @racket[valid+?].
 @section{Tasks}
 @defmodule[deepika/tasks]
 
-@defproc[(task-task! [del integer?] [proc procedure?]) integer?]{
+Note that the tasks module does not actually execute any tasks. Instead, it is
+merely a storage device and as such, actual execution of the tasks that are
+queued and ready to run is solely up to the client of this module.
+
+@defproc[(task-start! [del integer?] [proc procedure?]) integer?]{
     Queues @racket[proc] as a new task to start after @racket[del] seconds have
     elapsed. The result of this function is the id of the queued task.
 }
@@ -157,6 +163,13 @@ not @racket[valid?] nor @racket[valid+?].
 @defproc[(task-ready? [id integer?]) boolean?]{
     Returns @racket[#t] if the task specified by @racket[id] is ready to run.
 }
+
+@examples[
+    #:eval my-evaluator
+    (define tid (task-start! 5 (λ () (displayln "Go!"))))
+    (task-ready? tid)
+    (sleep 5)
+    (task-ready? tid)]
 
 @defproc[(task-remove! [id integer?]) any]{
     Irrevocably removes the task specified by @racket[id] from the queue. It 

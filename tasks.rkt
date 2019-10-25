@@ -14,6 +14,12 @@
 (define (next-task-id)
   (add1 (max-task-id)))
 
+(define (task/valid? id)
+  (hash-has-key? idx id))
+
+(define (get-task id)
+  (hash-ref idx id))
+
 (define (task-start! del proc)
   (let* ([id (next-task-id)]
          [t (task id (+ (current-seconds) del) proc)])
@@ -21,10 +27,8 @@
     id))
 
 (define (task-ready? id)
-  (match (hash-has-key? idx id)
-    [#t (let ([t (hash-ref idx id)])
-          (<= (task-start-time t) (current-seconds)))]
-    [_ #f]))
+  (let ([t (hash-ref idx id)])
+    (<= (task-start-time t) (current-seconds))))
 
 (define (task-remove! id)
   (hash-remove! idx id))
@@ -37,8 +41,10 @@
 
 (provide
  (contract-out
-  [task-start! (-> integer? procedure? integer?)]
-  [task-ready? (-> integer? boolean?)]
-  [task-remove! (-> integer? any)]
-  [tasks (-> (listof integer?))]
-  [tasks/ready (-> (listof integer?))]))
+  [task/valid? (-> integer? boolean?)]
+  [task-start! (-> integer? procedure? task/valid?)]
+  [task-ready? (-> task/valid? boolean?)]
+  [task-remove! (-> task/valid? any)]
+  [get-task (-> task/valid? task?)]
+  [tasks (-> (listof task/valid?))]
+  [tasks/ready (-> (listof task/valid?))]))

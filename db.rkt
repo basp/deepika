@@ -6,6 +6,9 @@
          racket/contract
          "common.rkt")
 
+; This is prefab since we *want* anybody to create
+; object ids without depending on this module.
+; The fast serialization is a nice bonus.
 (struct objid (num) #:prefab)
 
 (define $system (objid 0))
