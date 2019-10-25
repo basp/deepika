@@ -149,7 +149,27 @@ not @racket[valid?] nor @racket[valid+?].
 @section{Tasks}
 @defmodule[deepika/tasks]
 
+@defproc[(task-task! [del integer?] [proc procedure?]) integer?]{
+    Queues @racket[proc] as a new task to start after @racket[del] seconds have
+    elapsed. The result of this function is the id of the queued task.
+}
 
+@defproc[(task-ready? [id integer?]) boolean?]{
+    Returns @racket[#t] if the task specified by @racket[id] is ready to run.
+}
+
+@defproc[(task-remove! [id integer?]) any]{
+    Irrevocably removes the task specified by @racket[id] from the queue. It 
+    will not be executed.
+}
+
+@defproc[(tasks) (listof integer?)]{
+    Returns a list of ids of all tasks currently on the queue.
+}
+
+@defproc[(tasks/ready) (listof integer?)]{
+    Like @racket[tasks] but returns only those tasks that are ready to run.
+}
 
 @section{Parser}
 @defmodule[deepika/parser]
