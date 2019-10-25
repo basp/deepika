@@ -1,8 +1,6 @@
 #lang racket/base
 
-(require racket/unit
-         "db-unit.rkt"
-         "server-unit.rkt")
+(require racket/unit)
 
 (module+ test
   (require rackunit))
