@@ -3,7 +3,8 @@
 (require racket/class
          racket/set
          racket/match
-         racket/contract)
+         racket/contract
+         "common.rkt")
 
 (struct objid (num) #:prefab)
 
@@ -59,9 +60,9 @@
     
     (super-new)))
 
-(define (transfer! oid to-oid field-name)
+(define (transfer! oid to-oid field-name child-field-name)
   (define obj (find-object oid))
-  (define from (find-object (get-field location obj)))
+  (define from (find-object (dynamic-get-field child-field-name obj)))
   (define to (find-object to-oid))
   (define (exec-set-op op obj)
     (match obj
@@ -70,7 +71,8 @@
                 [args (list set oid)])
            (apply op args))]))
   (exec-set-op set-remove! from)
-  (exec-set-op set-add! to))
+  (exec-set-op set-add! to)
+  (dynamic-set-field! child-field-name obj to-oid))
 
 (define (find-object oid)
   (define k (objid->number oid))
@@ -88,9 +90,7 @@
              $nothing))]))
 
 (define (max-object-id)
-  (match (hash-keys idx)
-    (xs #:when (null? xs) 0)
-    (xs (apply max xs))))
+  (max-id (hash-keys idx) 0))
 
 (define (next-object-id)
   (add1 (max-object-id)))
@@ -124,15 +124,13 @@
   (get-field location (find-object oid)))
 
 (define (set-location! oid new-location)
-  (transfer! oid new-location 'contents)
-  (set-field! location (find-object oid) new-location))
+  (transfer! oid new-location 'contents 'location))
 
 (define (get-parent oid)
   (get-field parent (find-object oid)))
 
 (define (set-parent! oid new-parent)
-  (transfer! oid new-parent 'children)
-  (set-field! parent (find-object oid) new-parent))
+  (transfer! oid new-parent 'children 'parent))
 
 (define (get-contents oid)
   (set->list (get-field contents (find-object oid))))

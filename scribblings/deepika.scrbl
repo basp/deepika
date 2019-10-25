@@ -12,25 +12,18 @@
      (make-evaluator 'racket
         #:requires (list "db.rkt"))))
 
-@title{deepika}
+@title{Deepika}
 @author{basp}
 
-@defmodule[deepika/parser]
+Deepika is a MOO in the spirit of LambdaMOO.
 
-@defproc[(parse/args [s string?]) (listof string?)]{
-    Parses a string into arguments. This tokenizes the string on whitespace and
-    treats quoted strings as one token.
-}
+@table-of-contents[]
 
+@section{Database}
 @defmodule[deepika/db]
 
 The database module is responsible for persisting the state of the world. In our
 case, the world consists mainly of three things: objects, properties and verbs.
-
-@defthing[objid objid?]{
-    An object id is just a simple wrapper around an integer. 
-    We need these to keep them apart from regular integer values.    
-}
 
 @defthing[$nothing nothing?]{
     Represents the absence of a value and can generally be used as a sensible
@@ -39,6 +32,11 @@ case, the world consists mainly of three things: objects, properties and verbs.
 
 @defproc[(nothing? [x any/c]) boolean?]{
     Returns @racket[#t] if @racket[x] is @racket[$nothing].
+}
+
+@defthing[objid objid?]{
+    An object id is just a simple wrapper around an integer. 
+    We need these to keep them apart from regular integer values.    
 }
 
 @defproc[(objid? [x any/c]) boolean?]{
@@ -50,12 +48,29 @@ case, the world consists mainly of three things: objects, properties and verbs.
 }
 
 @defproc[(objid->number [oid objid?]) number?]{
-    Converts object id @racket[oid] into an integer number.
+    Converts an object id @racket[oid] into an number.
 }
 
 @defproc[(number->objid [num integer?]) objid?]{
-    Converts number @racket[num] into an object id.
+    Converts a number @racket[num] into an object id.
 }
+
+@examples[
+    #:eval my-evaluator
+    (objid->number (objid 123))
+    (number->objid 123)
+    (objid->number (number->objid 123))
+]
+
+Note that @racket[number->objid] can be used to create object id's that are 
+not @racket[valid?] nor @racket[valid+?].
+
+@examples[
+    #:eval my-evaluator
+    (objid->number $nothing)
+    (valid? (number->objid -1))
+    (valid+? (number->objid -123))
+]
 
 @defproc[(valid? [x any/c]) boolean?]{
     Returns @racket[#t] if @racket[x] is an object id that points to an actual 
@@ -81,9 +96,10 @@ case, the world consists mainly of three things: objects, properties and verbs.
     (valid? oid)
     (valid? (objid 123))]
 
-@defproc[(create-object! [pid valid+?]) objid?]{
-    Create a new object. If @racket[pid] is not specified then the object's 
-    parent property will be set to @racket[$nothing].
+@defproc[(create-object! [oid valid+? $nothing]) objid?]{
+    Create a new object with its parent set to @racket[oid]. If @racket[oid] is 
+    not specified then the object's parent property will be set to 
+    @racket[$nothing].
 }
 
 @defproc[(destroy-object! [oid valid?]) any/c]{
@@ -100,13 +116,12 @@ case, the world consists mainly of three things: objects, properties and verbs.
 }
 
 @defproc[(get-parent [oid valid?]) valid+?]{
-    Returns the @racket[oid] of the parent of the object referenced by object
-    @racket[oid].
+    Returns the parent id of the object with id @racket[oid].
 }
 
 @defproc[(set-parent! [oid valid?] [new-parent valid+?]) any]{
-    Sets the parent of the object referenced by object id @racket[oid] to the 
-    new parent specified by the @racket[new-parent] object id.
+    Sets the parent of object with id @racket[oid] to the value of
+    @racket[new-parent].
 }
 
 @defproc[(get-children [oid valid?]) (listof valid?)]{
@@ -123,11 +138,28 @@ case, the world consists mainly of three things: objects, properties and verbs.
     (get-children (get-parent o))]
 
 @defproc[(get-location [oid valid?]) valid+?]{
-    Returns the object id of the location of the object specified by 
-    @racket[oid].
+    Returns the location id of the object specified by @racket[oid].
 }
 
 @defproc[(set-location! [oid valid?] [new-location valid+?]) any]{
-    Sets the location of the object referenced by object id @racket[oid] to the
-    new location specifiedc by the @racket[new-location] object id.
+    Sets the location of object with id @racket[oid] to the value of
+    @racket[new-location].
 }
+
+@section{Tasks}
+@defmodule[deepika/tasks]
+
+
+
+@section{Parser}
+@defmodule[deepika/parser]
+
+@defproc[(parse/args [s string?]) (listof string?)]{
+    Parses a string into arguments. This tokenizes the string on whitespace and
+    treats quoted strings as one token.
+}
+
+@racketblock[
+    (equal? (parse/args "foo \"bar quux\" frotz")
+            (list "foo" "bar quux" "frotz"))
+]
