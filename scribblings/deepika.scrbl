@@ -17,14 +17,16 @@
 @title{Deepika}
 @author{basp}
 
-Deepika is a MOO in the spirit of LambdaMOO. MOO stands for MUD object oriented.
-MUD stands for multi-user domain. It is the predecessor to what we nowadays call
-an MMO. A MOO is a multi-user domain object oriented environment.
+Deepika is a MOO in the spirit of 
+@hyperlink["https://en.wikipedia.org/wiki/LambdaMOO"]{LambdaMOO}. MOO stands 
+for MUD object oriented. MUD stands for multi-user domain. It is the predecessor 
+to what we nowadays call an MMO. A MOO is a multi-user domain object oriented 
+environment.
 
 @table-of-contents[]
-
 @section{Overview}
 
+@subsection{Interface}
 Using the original LambdaMOO as a reference, we can typically divide a MOO into
 a few key components. At the very core is a TCP server that is not unlike a
 typical chat server. It reads lines of text and it sends lines of text.
@@ -41,6 +43,19 @@ code (called verbs) in the object database.
 When you consider that this player invoked code can create objects, destroy or
 relocate them, add properties or verbs (executable code) and manipulate their
 values, it is apparent that this leads to a very dynamic environment.
+
+@subsection{Implementation}
+Conceptually, there is only a single thread that is taking care of the 
+resources. This includes the database, the task queue and the connections. Since
+a MOO is generally slow-paced compared to modern games we are operating in the
+realm of seconds instead of milliseconds which gives us a lot of spare time 
+to perform computations in between each @italic{frame}.
+
+This thread, known as the @italic{game loop} ticks about 60 times each second
+by default if the hardware is capable. This corresponds to a 
+@italic{frame rate}, or @italic{tick rate} rather, of 60Hz. The 
+@italic{tick rate} setting can be configured on server startup. In general, 
+a @italic{tick rate} of 15Hz is pretty fast for a MOO.
 
 @section{Reference}
 
@@ -169,6 +184,19 @@ not @racket[valid?] nor @racket[valid+?].
     Sets the location of object with id @racket[oid] to the value of
     @racket[new-location].
 }
+
+@examples[
+    #:eval my-evaluator
+    (define container (create-object!))
+    container
+    (define thing1 (create-object!))
+    (define thing2 (create-object!))
+    (set-location! thing1 container)
+    (set-location! thing2 container)
+    (get-contents container)
+    (get-location thing1)
+    (get-location thing2)
+]
 
 @subsubsection{Properties}
 TODO

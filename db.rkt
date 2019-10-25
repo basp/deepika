@@ -145,6 +145,11 @@
   (hash-keys (get-field props (find-object oid))))
 
 (define (add-prop! oid name value [info null])
+  ; We probably don't want to create this property
+  ; if this key already exists so we could move it
+  ; to a let in the else body below. However, for
+  ; readability purposes we're going to leave it
+  ; here for now and worry about memory later.
   (define p (new db:property%
                  [name name]
                  [value value]
