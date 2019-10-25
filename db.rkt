@@ -4,7 +4,7 @@
          racket/set
          racket/match
          racket/contract
-         "common.rkt")
+         "utils.rkt")
 
 ; This is prefab since we *want* anybody to create
 ; object ids without depending on this module.

@@ -1,6 +1,11 @@
-#lang racket
+#lang racket/base
 
-(require "gen-server-callbacks-sig.rkt"
+(require racket/class
+         racket/unit
+         racket/match
+         racket/tcp
+         racket/port         
+         "gen-server-callbacks-sig.rkt"
          "gen-server-sig.rkt"
          "gen-server-unit.rkt"
          "db.rkt"
