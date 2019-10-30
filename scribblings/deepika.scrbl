@@ -312,15 +312,29 @@ A @italic{verb-spec} is a name specification for a verb. It consists of a
 string that optionally includes an @racket[#\*] character. The position of the
 asterisk specifies the minimum match length @italic{n} of the verb spec.
 
+Every verb has one or more names; all of the names are kept in a single string, 
+separated by spaces. In the simplest case, a @italic{verb-desc} is just a word 
+made up of any characters other than spaces and stars (i.e., @racket[#\space] 
+and @racket[#\*]). In this case, the verb-desc matches only itself; that is, 
+the name must be matched exactly.
+
+If the name contains a single star, however, then the name matches any prefix 
+of itself that is at least as long as the part before the star. For example, 
+the @italic{verb-desc} @racket["foo*bar"] matches any of the strings 
+@racket["foo"], @racket["foob"], @racket["fooba"], or @racket["foobar"]. Note 
+that the star itself is not considered part of the name. If the 
+@italic{verb-desc} ends in a star, then it matches any string that begins with 
+the part before the star. For example, the verb-name @racket["foo*"] matches 
+any of the strings @racket["foo"], @racket["foobar"], @racket["food"], or 
+@racket["foogleman"], among many others. As a special case, if the 
+@italic{verb-desc} is @racket["*"] (i.e., a single star all by itself), then it 
+matches anything at all.
+
 @examples[
     #:eval my-evaluator
     (match-verb-spec "foo" "foo*bar")
     (match-verb-spec "foobar" "foo*bar")
     (match-verb-spec "fo" "foo*bar")
     (match-verb-spec "foobarx" "foo*bar")]
-
-
-
-
 
 
