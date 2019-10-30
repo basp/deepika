@@ -19,16 +19,21 @@
      (cons (list->string (reverse acc)) rest)]
     [(list a rest ...)
      #:when (quotation-mark? a)
-     (parse-word* rest acc)]
+     (parse-word* rest acc)] 
     [(list a rest ...)
      (parse-word* rest (cons a acc))]
     [else
+     ; -> (null? else)
      (cons (list->string (reverse acc)) null)]))
 
 (define (parse-word chars [acc null])
   (match chars
     [(list a rest ...)
      #:when (quotation-mark? a)
+     ; note the mode switch to quoted (parse-word*)
+     ; this is here to support cases such as:
+     ; * baz" fr"otz" => "baz frotz"
+     ; * bl"o"rt => "blort" 
      (parse-word* rest acc)]
     [(list a rest ...)
      #:when (char-blank? a)
@@ -36,6 +41,7 @@
     [(list a rest ...)
      (parse-word rest (cons a acc))]
     [else
+     ; -> (null? else)
      (cons (list->string (reverse acc)) null)]))
 
 (define (priv/parse-args chars [acc null])
