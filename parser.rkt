@@ -48,13 +48,13 @@
        (priv/parse-args t (cons w acc)))]
     [rest (reverse acc)]))
 
-(define (parse-args str)
+(define (string->args str)
   (priv/parse-args (string->list str)))
 
-(provide parse-args)
+(provide string->args)
 
 (module+ test
   (require rackunit)
   (define argstr "foo \"bar mumble\" baz\" \"fr\"otz\" bl\"o\"rt")
-  (define args (parse-args argstr))
+  (define args (string->args argstr))
   (check-equal? args '("foo" "bar mumble" "baz frotz" "blort")))
