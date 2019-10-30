@@ -38,20 +38,23 @@
     [else
      (cons (list->string (reverse acc)) null)]))
 
-(define (parse/args chars [acc null])
+(define (priv/parse-args chars [acc null])
   (match (skip-blank chars)
     [(list a rest ...)
      (let* ([p (if (quotation-mark? a) parse-word* parse-word)]
             [res (p (cons a rest))]
             [w (car res)]
             [t (cdr res)])
-       (parse/args t (cons w acc)))]
+       (priv/parse-args t (cons w acc)))]
     [rest (reverse acc)]))
 
-(provide parse/args)
+(define (parse-args str)
+  (priv/parse-args (string->list str)))
+
+(provide parse-args)
 
 (module+ test
   (require rackunit)
   (define argstr "foo \"bar mumble\" baz\" \"fr\"otz\" bl\"o\"rt")
-  (define args (parse/args (string->list argstr)))
+  (define args (parse-args argstr))
   (check-equal? args '("foo" "bar mumble" "baz frotz" "blort")))
