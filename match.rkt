@@ -19,8 +19,8 @@
 
 (define (priv/match-verb-spec* x spec)
   (match (regexp-match (regexp (string-delete #\* spec)) x)
-    [#f (cons #f x)]
-    [x (cons #t x)]))
+    [#f (cons #f (car x))]
+    [x (cons #t (car x))]))
 
 (define (match-verb-spec x spec)
   (match spec
