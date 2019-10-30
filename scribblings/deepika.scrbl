@@ -1,6 +1,6 @@
 #lang scribble/manual
 @(require (@for-label)
-            "../parser.rkt"
+            "../cmd-parser.rkt"
             "../db.rkt"
             "../tasks.rkt"
             racket
@@ -12,7 +12,9 @@
                   [sandbox-error-output 'string]
                   [sandbox-memory-limit 50])
      (make-evaluator 'racket
-        #:requires (list "db.rkt" "tasks.rkt"))))
+        #:requires (list "db.rkt" 
+                         "tasks.rkt"
+                         "cmd-parser.rkt"))))
 
 @title{Deepika}
 @author{basp}
@@ -279,17 +281,15 @@ as well.
     (i.e. when @racket[task-ready?] returns @racket[#t]).
 }
 
-@subsection{Parser}
-@defmodule[deepika/parser]
+@subsection{Command Parser}
+@defmodule[deepika/cmd-parser]
 
-@defproc[(parse/args [s string?]) (listof string?)]{
-    Parses a string into arguments. This tokenizes the string on whitespace and
-    treats quoted strings as one token.
+@defproc[(string->args [s string?]) (listof string?)]{
+    Tokenizes the string on whitespace and treats quoted strings as one token.
 }
 
-For example, the result of the following expression is @racket[#t]:
-
-@racketblock[
-    (equal? (parse/args "foo \"bar quux\" frotz")
-            (list "foo" "bar quux" "frotz"))
+@examples[
+    #:eval my-evaluator
+    (define argstr "foo \"bar mumble\" baz\" \"fr\"otz\" bl\"o\"rt")
+    (string->args argstr)
 ]

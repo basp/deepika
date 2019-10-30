@@ -9,7 +9,7 @@
          "gen-server-sig.rkt"
          "gen-server-unit.rkt"
          "db.rkt"
-         "parser.rkt")
+         "cmd-parser.rkt")
 
 (define socket%
   (class object%
