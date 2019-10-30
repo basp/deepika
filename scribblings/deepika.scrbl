@@ -312,11 +312,12 @@ A @italic{verb-spec} is a name specification for a verb. It consists of a
 string that optionally includes an @racket[#\*] character. The position of the
 asterisk specifies the minimum match length @italic{n} of the verb spec.
 
-Every verb has one or more names; all of the names are kept in a single string, 
-separated by spaces. In the simplest case, a @italic{verb-desc} is just a word 
-made up of any characters other than spaces and stars (i.e., @racket[#\space] 
-and @racket[#\*]). In this case, the verb-desc matches only itself; that is, 
-the name must be matched exactly.
+Every verb has one or more @italic{verb descriptions}. All of these are kept in 
+a single string, separated by spaces. In the simplest case, a 
+@italic{verb-desc} is just a word made up of any characters other than spaces 
+and stars (i.e., @racket[#\space] and @racket[#\*]). In this case, the 
+@italic{verb-desc} matches only itself; that is, the name must be matched 
+exactly.
 
 If the name contains a single star, however, then the name matches any prefix 
 of itself that is at least as long as the part before the star. For example, 
