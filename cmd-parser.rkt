@@ -1,6 +1,7 @@
 #lang racket/base
 
-(require racket/match)
+(require racket/match
+         racket/contract)
 
 (define (quotation-mark? char)
   (equal? #\" char))
@@ -57,7 +58,9 @@
 (define (string->args str)
   (priv/parse-args (string->list str)))
 
-(provide string->args)
+(provide
+ (contract-out
+  [string->args (-> string? (listof string?))]))
 
 (module+ test
   (require rackunit)

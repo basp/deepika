@@ -1,6 +1,7 @@
 #lang racket/base
 
 (require racket/match
+         racket/contract
          srfi/13)
 
 (define (min-match-length spec)
@@ -21,7 +22,9 @@
     ["*" (cons #t x)]
     [else (priv/match-verb-spec x spec)]))
 
-(provide match-verb-spec)
+(provide
+ (contract-out
+  [match-verb-spec (-> string? string? boolean?)]))
 
 (module+ test
   (require rackunit)
