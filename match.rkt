@@ -11,11 +11,10 @@
 (define (priv/match-verb-spec x spec)
   (match (regexp-match (regexp x) (string-delete #\* spec))
     [#f (cons #f x)]
-    [m
-     (let* ([x (car m)])
-       (cons (>= (string-length x)
-                 (min-match-length spec))
-             x))])) 
+    [m (let* ([x (car m)])
+         (cons (>= (string-length x)
+                   (min-match-length spec))
+               x))])) 
 
 (define (match-verb-spec x spec)
   (match spec
@@ -29,7 +28,7 @@
   (check-true (car (match-verb-spec "foo" "foo*bar")))
   (check-true (car (match-verb-spec "foobar" "foo*bar")))
   (check-true (car (match-verb-spec "fooba" "foo*bar")))
-  (check-false (car (match-verb-spec "foobarx" "foo*bar")))
-  (check-false (car (match-verb-spec "fo" "foo*bar")))
   (check-true (car (match-verb-spec "quux" "*")))
-  (check-true (car (match-verb-spec "frotz" "*"))))
+  (check-true (car (match-verb-spec "frotz" "*")))
+  (check-false (car (match-verb-spec "foobarx" "foo*bar")))
+  (check-false (car (match-verb-spec "fo" "foo*bar"))))
