@@ -17,10 +17,20 @@
                    (min-match-length spec))
                x))])) 
 
+(define (priv/match-verb-spec* x spec)
+  (match (regexp-match (regexp (string-delete #\* spec)) x)
+    [#f (cons #f x)]
+    [x (cons #t x)]))
+
 (define (match-verb-spec x spec)
   (match spec
-    ["*" (cons #t x)]
-    [else (priv/match-verb-spec x spec)]))
+    ["*"
+     (cons #t x)]
+    [x
+     #:when (string-suffix? "*" spec)
+     (priv/match-verb-spec* x spec)]
+    [else
+     (priv/match-verb-spec x spec)]))
 
 (provide
  (contract-out

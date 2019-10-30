@@ -336,6 +336,10 @@ matches anything at all.
     (match-verb-spec "foo" "foo*bar")
     (match-verb-spec "foobar" "foo*bar")
     (match-verb-spec "fo" "foo*bar")
-    (match-verb-spec "foobarx" "foo*bar")]
+    (match-verb-spec "foobarx" "foo*bar")
+    (match-verb-spec "foo" "foo*")
+    (match-verb-spec "foobar" "foo*")
+    (match-verb-spec "food" "foo*")
+    (match-verb-spec "foogleman" "foo*")]
 
 
