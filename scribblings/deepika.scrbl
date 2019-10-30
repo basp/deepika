@@ -27,6 +27,9 @@ for MUD object oriented. MUD stands for multi-user domain. It is the predecessor
 to what we nowadays call an MMO. A MOO is a multi-user domain object oriented 
 environment.
 
+The current state of the project can be found at 
+@hyperlink["https://github.com/basp/deepika"]{github.com/basp/deepika}.
+
 @table-of-contents[]
 @section{Overview}
 
