@@ -1,34 +1,57 @@
 #lang racket/base
 
-(require megaparsack
-         megaparsack/text)
+(require racket/match)
 
-(require data/monad
-         data/applicative)
+(define (quotation-mark? char)
+  (equal? #\" char))
+
+(define (skip-blank chars)
+  (match chars
+    [(list a rest ...)
+     #:when (char-blank? a)
+     (skip-blank rest)]
+    [rest rest]))
+
+(define (parse-word* chars [acc null])
+  (match chars
+    [(list a b rest ...)
+     #:when (and (quotation-mark? a) (char-blank? b))
+     (cons (list->string (reverse acc)) rest)]
+    [(list a rest ...)
+     #:when (quotation-mark? a)
+     (parse-word* rest acc)]
+    [(list a rest ...)
+     (parse-word* rest (cons a acc))]
+    [else
+     (cons (list->string (reverse acc)) null)]))
+
+(define (parse-word chars [acc null])
+  (match chars
+    [(list a rest ...)
+     #:when (quotation-mark? a)
+     (parse-word* rest acc)]
+    [(list a rest ...)
+     #:when (char-blank? a)
+     (cons (list->string (reverse acc)) chars)]
+    [(list a rest ...)
+     (parse-word rest (cons a acc))]
+    [else
+     (cons (list->string (reverse acc)) null)]))
+
+(define (parse/args chars [acc null])
+  (match (skip-blank chars)
+    [(list a rest ...)
+     (let* ([p (if (quotation-mark? a) parse-word* parse-word)]
+            [res (p (cons a rest))]
+            [w (car res)]
+            [t (cdr res)])
+       (parse/args t (cons w acc)))]
+    [rest (reverse acc)]))
 
 (provide parse/args)
 
-(define ident-char/p (char-not-in/p "\" "))
-
-(define arg/p
-  (do [h <- ident-char/p]    
-      [t <- (many/p ident-char/p)]
-      (pure (list->string (cons h t)))))
-
-(define quoted-arg/p
-  (do (char/p #\")
-      [w <- (many/p (char-not-in/p "\""))]
-      (or/p (char/p #\") eof/p)
-      (pure (list->string w))))
-
-(define arg*/p
-  (do [w <- (or/p arg/p quoted-arg/p)]
-      (many/p space/p)
-      (pure w)))
-
-(define args/p
-  (do (many/p space/p)
-      (many/p arg*/p)))
-
-(define (parse/args argstr)
-  (parse-result! (parse-string args/p argstr)))
+(module+ test
+  (require rackunit)
+  (define argstr "foo \"bar mumble\" baz\" \"fr\"otz\" bl\"o\"rt")
+  (define args (parse/args (string->list argstr)))
+  (check-equal? args '("foo" "bar mumble" "baz frotz" "blort")))
