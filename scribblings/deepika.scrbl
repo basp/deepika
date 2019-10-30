@@ -3,6 +3,7 @@
             "../cmd-parser.rkt"
             "../db.rkt"
             "../tasks.rkt"
+            "../match.rkt"
             racket
             racket/sandbox
             scribble/example)
@@ -14,7 +15,8 @@
      (make-evaluator 'racket
         #:requires (list "db.rkt" 
                          "tasks.rkt"
-                         "cmd-parser.rkt"))))
+                         "cmd-parser.rkt"
+                         "match.rkt"))))
 
 @title{Deepika}
 @author{basp}
@@ -293,3 +295,32 @@ as well.
     (define argstr "foo \"bar mumble\" baz\" \"fr\"otz\" bl\"o\"rt")
     (string->args argstr)
 ]
+
+@subsection{Match}
+@defmodule[deepika/match]
+
+@defproc[(match-verb-spec [s string?] [spec string?]) boolean?]{
+    Returns @racket[#t] if @racket[s] matches given @racket[spec].
+}
+
+Verbs do not have definite names and the database supports duplicate names as 
+well. There are valid use cases for this since verb lookup does not only allow
+for multiple names but multiple variants of @italic{verb args} as well. In
+effect this allows two verbs to share names but operate in different contexts.
+
+A @italic{verb-spec} is a name specification for a verb. It consists of a
+string that optionally includes an @racket[#\*] character. The position of the
+asterisk specifies the minimum match length @italic{n} of the verb spec.
+
+@examples[
+    #:eval my-evaluator
+    (match-verb-spec "foo" "foo*bar")
+    (match-verb-spec "foobar" "foo*bar")
+    (match-verb-spec "fo" "foo*bar")
+    (match-verb-spec "foobarx" "foo*bar")]
+
+
+
+
+
+

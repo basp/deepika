@@ -24,7 +24,7 @@
 
 (provide
  (contract-out
-  [match-verb-spec (-> string? string? boolean?)]))
+  [match-verb-spec (-> string? string? (cons/c boolean? any/c))]))
 
 (module+ test
   (require rackunit)
