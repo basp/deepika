@@ -99,19 +99,14 @@
 (define moo-parse
   (parser
    (start start)
-
    (end EOF)
-
    (src-pos)
-
    (tokens value-tokens keyword-tokens op-tokens symbol-tokens)
-
    (error
     (λ (tok-ok? tok-name tok-value start-pos end-pos)
       (displayln start-pos)
       (displayln tok-ok?)
       (displayln tok-name)))
-
    (precs (right =)
           (nonassoc ? PIPE)
           (left OR AND)
@@ -121,7 +116,6 @@
           (right ^)
           (left ! NEG)
           (nonassoc DOT COLON $))
-   
    (grammar
     (start [() #f]
            [(expr) $1])
