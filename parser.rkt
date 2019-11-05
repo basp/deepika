@@ -84,9 +84,10 @@
 (struct sub (lhs rhs) #:transparent)
 (struct mul (lhs rhs) #:transparent)
 (struct neg (exp) #:transparent)
-(struct scatter (xs) #:transparent)
-(struct objid (x) #:transparent)
-(struct arglist (x) #:transparent)
+(struct objid (val) #:transparent)
+(struct arglist (val) #:transparent)
+(struct condexpr (pred then else) #:transparent)
+(struct propref (obj name) #:transparent)
 
 (define moo-parse
   (parser
@@ -101,7 +102,8 @@
           (left - +)
           (left * / %)
           (right ^)
-          (left ! NEG))
+          (left ! NEG)
+          (nonassoc ? PIPE DOT))
    (grammar
     (start [() #f]
            [(expr) $1])
@@ -120,4 +122,11 @@
           [(expr * expr) (mul $1 $3)]
           [(- expr) (prec NEG) (neg $2)]
           [(LPAREN expr RPAREN) $2]
-          [(LBRACE arglist RBRACE) (arglist $2)]))))
+          [(LBRACE arglist RBRACE)
+           (arglist $2)]
+          [(expr ? expr PIPE expr)
+           (condexpr $1 $3 $5)]
+          [(expr DOT LPAREN expr RPAREN)
+           (propref $1 $4)]
+          [(expr DOT ID)
+           (propref $1 (id $3))]))))
