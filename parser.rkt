@@ -60,6 +60,7 @@
    [")" (token-RPAREN)]
    ["|" (token-PIPE)]
    ["||" (token-OR)]
+   ["&&" (token-AND)]
    ["==" (token-EQ)]
    ["!=" (token-NE)]
    ["<=" (token-LE)]
@@ -86,12 +87,14 @@
 (struct sub (lhs rhs) #:transparent)
 (struct mul (lhs rhs) #:transparent)
 (struct div (lhs rhs) #:transparent)
+(struct mod (lhs rhs) #:transparent)
 (struct neg (exp) #:transparent)
 (struct set (lhs rhs) #:transparent)
 (struct objid (val) #:transparent)
 (struct arglist (val) #:transparent)
 (struct condexpr (pred then else) #:transparent)
 (struct propref (obj name) #:transparent)
+(struct verbcall (obj vdesc args) #:transparent)
 
 (define moo-parse
   (parser
@@ -105,11 +108,14 @@
       (displayln tok-ok?)
       (displayln tok-name)))
    (precs (right =)
+          (nonassoc ? PIPE)
+          (left OR AND)
+          (left EQ NE < LE GE IN)
           (left - +)
           (left * / %)
           (right ^)
           (left ! NEG)
-          (nonassoc ? PIPE DOT COLON))
+          (nonassoc DOT COLON $))
    (grammar
     (start [() #f]
            [(expr) $1])
@@ -131,7 +137,7 @@
           [($ ID)
            (propref (objid 0) $2)]
           [(expr COLON ID LPAREN arglist RPAREN)
-           (list $1 (id $3) $5)]
+           (verbcall $1 (id $3) $5)]
           [(expr + expr)
            (add $1 $3)]
           [(expr - expr)
@@ -140,6 +146,8 @@
            (mul $1 $3)]
           [(expr / expr)
            (div $1 $3)]
+          [(expr % expr)
+           (mod $1 $3)]
           [(expr = expr)
            (set $1 $3)]
           [(- expr)
