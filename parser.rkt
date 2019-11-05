@@ -133,11 +133,14 @@
           [(OBJECT)
            (const (objid $1))]
           [(ID)
+           ; any reference in environment
            (id $1)]
           [($ ID)
+           ; system object prop reference
            (propref (objid 0) $2)]
           [(expr COLON ID LPAREN arglist RPAREN)
            (verbcall $1 (id $3) $5)]
+          ; binary ops
           [(expr + expr)
            (add $1 $3)]
           [(expr - expr)
@@ -148,22 +151,31 @@
            (div $1 $3)]
           [(expr % expr)
            (mod $1 $3)]
+          ; assignment
           [(expr = expr)
            (set $1 $3)]
+          ; unary ops
           [(- expr)
            (prec NEG)
            (neg $2)]
+          ; expression with explicit precedence
           [(LPAREN expr RPAREN)
            $2]
+          ; list expression
           [(LBRACE arglist RBRACE)
            (arglist $2)]
+          ; conditional expression (inline)
           [(expr ? expr PIPE expr)
            (condexpr $1 $3 $5)]
+          ; dynamic property reference
           [(expr DOT LPAREN expr RPAREN)
            (propref $1 $4)]
+          ; static property reference
           [(expr DOT ID)
            (propref $1 (id $3))]))))
 
 (define (parse/string s)
   (define ip (open-input-string s))
   (moo-parse (λ () (moo-lex ip))))
+
+(provide parse/string)
