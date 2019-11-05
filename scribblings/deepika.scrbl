@@ -178,9 +178,9 @@ not @racket[valid?] nor @racket[valid+?].
     #:eval my-evaluator
     (define o (create-object!))
     (define p (create-object!))
-    (get-parent o)
+    (valid? (get-parent o))
     (set-parent! o p)
-    (get-parent o)
+    (valid? (get-parent o))
     (get-children (get-parent o))]
 
 @defproc[(get-location [oid valid?]) valid+?]{
@@ -288,6 +288,15 @@ as well.
 
 @subsection{Command Parser}
 @defmodule[deepika/cmd-parser]
+
+The server next breaks up the command into words. In the simplest case, the 
+command is broken into words at every run of space characters. For example, the 
+command @racket["foo bar baz"] would be broken into the words @racket["foo"], 
+@racket["bar"], and @racket["baz"]. To force the server to include spaces in 
+a @italic{word}, all or part of a word can be enclosed in double-quotes. For 
+example, the command @racket["foo \"bar mumble\" baz\" \"fr\"otz\" bl\"o\"rt"]
+is broken into the words @racket["foo"], @racket["bar mumble"], 
+@racket["baz frotz"], and @racket["blort"]. 
 
 @defproc[(string->args [s string?]) (listof string?)]{
     Tokenizes the string on whitespace and treats quoted strings as one token.
