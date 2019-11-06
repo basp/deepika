@@ -7,7 +7,6 @@
 
 ; Things that might be different to standard MOO parsing:
 ; * does not support "lazy" floating point literals (e.g. "1." or ".123")
-; * does support range literals (e.g. "1..5")
 ; * does support hash tables (e.g. "[foo => 123, "bar" => quux]")
 
 (define moo-parse
