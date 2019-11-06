@@ -60,8 +60,8 @@
 (define moo-lex
   (lexer-src-pos
    [(eof) 'EOF]
-   [#\. (token-DOT)]
    [whitespace (return-without-pos (moo-lex input-port))]
+   ["." (token-DOT)]
    [":" (token-COLON)]
    [";" (token-SEMICOLON)]
    ["," (token-COMMA)]
