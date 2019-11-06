@@ -62,12 +62,15 @@
     (codes [(ANY) (expr-const 0)]
            [(ne-arglist) (expr-list $1)])
 
+    ;; maybe empty elseif arms
     (elseifs [() null]
              [(ne-elseifs) (reverse $1)])
 
+    ;; non-empty elseif arms
     (ne-elseifs [(elseifs ELSEIF LPAREN expr RPAREN statements)
                  (cons (cond-arm $4 $6) $1)])
 
+    ;; else for if-statement
     (elsepart [() null]
               [(ELSE statements) $2])
     
