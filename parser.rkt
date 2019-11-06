@@ -4,7 +4,8 @@
          parser-tools/yacc
          (prefix-in : parser-tools/lex-sre)
          (only-in srfi/13 string-trim-both)
-         "shared.rkt")
+         "shared.rkt"
+         "ast.rkt")
 
 (define-tokens value-tokens
   (INTEGER
@@ -106,20 +107,6 @@
          (:seq digits "."))
     (token-FLOAT (string->number lexeme))]))
 
-(struct expr-const (val) #:transparent)
-(struct expr-id (x) #:transparent)
-(struct expr-binary (op lhs rhs) #:transparent)
-(struct expr-unary (op val) #:transparent)
-(struct expr-list (val) #:transparent)
-(struct expr-hash (val) #:transparent)
-(struct expr-set! (lhs rhs) #:transparent)
-(struct expr-cond (pred then else) #:transparent)
-(struct expr-prop (obj name) #:transparent)
-(struct expr-verb (obj vdesc args) #:transparent)
-(struct expr-call (fn args) #:transparent)
-(struct expr-catch (try codes except) #:transparent)
-(struct expr-error (type) #:transparent)
-
 (define moo-parse
   (parser
    (start start)
@@ -150,30 +137,30 @@
    (grammar
     (start [() #f]
            [(expr) $1])
-    ;maybe empty list
+    ;; maybe empty list
     (arglist [() null]
              [(ne-arglist) (reverse $1)])
-    ;non-empty list
+    ;; non-empty list
     (ne-arglist [(expr) (list $1)]
                 [(ne-arglist COMMA expr)
                  (cons $3 $1)])
-    ;key-value pair for hash
+    ;; key-value pair for hash
     (kvp [(expr ARROW expr)
           (cons $1 $3)])
-    ;maybe empty hash
+    ;; maybe empty hash
     (hash [() null]
           [(ne-hash) (reverse $1)])
-    ;non-empty hash
+    ;; non-empty hash
     (ne-hash [(kvp) (list $1)]
              [(ne-hash COMMA kvp)
               (cons $3 $1)])
-    ;default value for catch expression
+    ;; default value for catch expression
     (:default [() (expr-const 0)]
               [(ARROW expr) $2])
-    ;error codes to catch
+    ;; error codes to catch
     (codes [(ANY) (expr-const 0)]
            [(ne-arglist) (expr-list $1)])
-    ;expressions
+    ;; expressions
     (expr [(INTEGER)
            (expr-const $1)]
           [(FLOAT)
