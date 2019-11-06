@@ -89,7 +89,11 @@
           [(FOR ID IN LPAREN expr RPAREN statements ENDFOR)
            (stmt-loop (expr-id $2) $5 $7)]
           [(FOR ID IN LBRACK expr TO expr RBRACK statements ENDFOR)
-           (stmt-range (expr-id $2) $5 $7 $9)])
+           (stmt-range (expr-id $2) $5 $7 $9)]
+          [(WHILE LPAREN expr RPAREN statements ENDWHILE)
+           (stmt-while $3 $5)]
+          [(RETURN expr SEMICOLON)
+           (stmt-return $2)])
     ;; expressions
     (expr [(INTEGER)
            (expr-const $1)]

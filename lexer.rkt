@@ -20,7 +20,9 @@
    ELSEIF
    ENDIF
    FOR
-   ENDFOR))
+   ENDFOR
+   WHILE
+   ENDWHILE))
 
 (define-empty-tokens error-tokens
   (ANY))
@@ -35,8 +37,7 @@
    RPAREN
    LBRACK
    RBRACK
-   BACKTICK
-   TO))
+   BACKTICK))
 
 (define-empty-tokens op-tokens
   (=
@@ -50,6 +51,8 @@
    SQUOTE
    DOT : $
    ARROW
+   TO
+   RETURN
    EOF))
 
 (define-lex-abbrevs
@@ -102,6 +105,9 @@
    ["endif" (token-ENDIF)]
    ["for" (token-FOR)]
    ["endfor" (token-ENDFOR)]
+   ["while" (token-WHILE)]
+   ["endwhile" (token-ENDWHILE)]
+   ["return" (token-RETURN)]
    [(char-set "?<>+-*/%^!:$=")
     (string->symbol lexeme)]
    [name
