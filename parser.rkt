@@ -7,7 +7,7 @@
 
 ; We do not support "lazy" floating point literals (e.g. "1." or ".123")
 ; We do support range literals (e.g. "1..5")
-; We do support hash tables (e.g. "]foo => 123, "bar" => quux]")
+; We do support hash tables (e.g. "[foo => 123, "bar" => quux]")
 
 (define moo-parse
   (parser
