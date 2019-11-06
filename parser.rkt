@@ -177,7 +177,7 @@
           [(ID)
            (expr-id $1)]
           [(ERROR)
-           (expr-const $1)]
+           (expr-error $1)]
           [(TRUE)
            (expr-const 1)]
           [(FALSE)
@@ -235,3 +235,51 @@
   (moo-parse (λ () (moo-lex ip))))
 
 (provide parse/string)
+
+(module+ test
+  (require rackunit)
+  (let ([ast (parse/string "123")])
+    (check-equal? ast (expr-const 123)))
+  (let ([ast (parse/string "123.456")])
+    (check-equal? ast (expr-const 123.456)))
+  (let ([ast (parse/string "\"frotz\"")])
+    (check-equal? ast (expr-const "frotz")))
+  (let ([ast (parse/string "-123")])
+    (check-equal? ast (expr-unary 'neg (expr-const 123))))
+  (let ([ast (parse/string "-123.456")])
+    (check-equal? ast (expr-unary 'neg (expr-const 123.456))))
+  (let ([ast (parse/string "#123")])
+    (check-equal? ast (expr-const (objid 123))))
+  (let ([ast (parse/string "#-123")])
+    (check-equal? ast (expr-const (objid -123))))
+  (let ([ast (parse/string "E_TYPE")])
+    (check-equal? ast (expr-error 'E_TYPE)))
+  (let ([ast (parse/string "E_ARGS")])
+    (check-equal? ast (expr-error 'E_ARGS)))
+  (let ([ast (parse/string "{}")])
+    (check-equal? ast (expr-list null)))
+  (let ([ast (parse/string "[]")])
+    (check-equal? ast (expr-hash (make-hash))))
+  (let ([ast (parse/string "{1, foo, \"bar\"}")])
+    (check-equal? ast (expr-list
+                       (list
+                        (expr-const 1)
+                        (expr-id "foo")
+                        (expr-const "bar")))))
+  (let ([ast (parse/string "[1 => 2]")])
+    (check-equal? ast (expr-hash
+                       (make-hash
+                        (list
+                         (cons (expr-const 1)
+                               (expr-const 2)))))))
+  (let ([ast (parse/string "[foo => bar, \"quux\" => 123.456]")])
+    (check-equal? ast (expr-hash
+                       (make-hash
+                        (list
+                         (cons (expr-id "foo")
+                               (expr-id "bar"))
+                         (cons (expr-const "quux")
+                               (expr-const 123.456)))))))
+  (let ([ast (parse/string "{foo}")])
+    (check-equal? ast (expr-list (list (expr-id "foo"))))))
+
