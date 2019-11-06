@@ -110,8 +110,9 @@
 (struct expr-id (x) #:transparent)
 (struct expr-binary (op lhs rhs) #:transparent)
 (struct expr-unary (op val) #:transparent)
-(struct expr-set! (lhs rhs) #:transparent)
 (struct expr-list (val) #:transparent)
+(struct expr-hash (val) #:transparent)
+(struct expr-set! (lhs rhs) #:transparent)
 (struct expr-cond (pred then else) #:transparent)
 (struct expr-prop (obj name) #:transparent)
 (struct expr-verb (obj vdesc args) #:transparent)
@@ -144,8 +145,8 @@
           (left * / %)
           (right ^)
           (left ! NEG)
-          (nonassoc DOT COLON LBRACK $
-                    LPAREN))
+          (nonassoc DOT COLON $
+                    LBRACK LPAREN))
    (grammar
     (start [() #f]
            [(expr) $1])
@@ -154,6 +155,10 @@
     (ne-arglist [(expr) (list $1)]
                 [(ne-arglist COMMA expr)
                  (cons $3 $1)])
+    (kvp [(expr ARROW expr)
+          (cons $1 $3)])
+    (hash [(kvp) (list $1)]
+          [(hash COMMA kvp) (cons $3 $1)])
     (:default [() (expr-const 0)]
               [(ARROW expr) $2])
     (codes [(ANY) (expr-const 0)]
@@ -211,6 +216,8 @@
            $2]
           [(LBRACE arglist RBRACE)
            (expr-list $2)]
+          [(LBRACE hash RBRACE)
+           (expr-hash (make-hash $2))]
           [(expr ? expr PIPE expr)
            (expr-cond $1 $3 $5)]
           [(BACKTICK expr ! codes :default SQUOTE)
