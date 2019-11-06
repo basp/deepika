@@ -150,22 +150,30 @@
    (grammar
     (start [() #f]
            [(expr) $1])
+    ;maybe empty list
     (arglist [() null]
              [(ne-arglist) (reverse $1)])
+    ;non-empty list
     (ne-arglist [(expr) (list $1)]
                 [(ne-arglist COMMA expr)
                  (cons $3 $1)])
+    ;key-value pair for hash
     (kvp [(expr ARROW expr)
           (cons $1 $3)])
+    ;maybe empty hash
     (hash [() null]
           [(ne-hash) (reverse $1)])
+    ;non-empty hash
     (ne-hash [(kvp) (list $1)]
              [(ne-hash COMMA kvp)
               (cons $3 $1)])
+    ;default value for catch expression
     (:default [() (expr-const 0)]
               [(ARROW expr) $2])
+    ;error codes to catch
     (codes [(ANY) (expr-const 0)]
            [(ne-arglist) (expr-list $1)])
+    ;expressions
     (expr [(INTEGER)
            (expr-const $1)]
           [(FLOAT)
