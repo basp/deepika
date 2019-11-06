@@ -4,12 +4,8 @@
          racket/set
          racket/match
          racket/contract
-         "utils.rkt")
-
-; This is prefab since we *want* anybody to create
-; object ids without depending on this module.
-; The fast serialization is a nice bonus.
-(struct objid (num) #:prefab)
+         "utils.rkt"
+         "shared.rkt")
 
 (define $system (objid 0))
 (define $nothing (objid -1))

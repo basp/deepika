@@ -3,14 +3,16 @@
 (require parser-tools/lex
          parser-tools/yacc
          (prefix-in : parser-tools/lex-sre)
-         (only-in srfi/13 string-trim-both))
+         (only-in srfi/13 string-trim-both)
+         "shared.rkt")
 
 (define-tokens value-tokens
   (INTEGER
    FLOAT
    STRING
    OBJECT
-   ID))
+   ID
+   ERROR))
 
 (define-empty-tokens keyword-tokens
   (TRUE
@@ -81,6 +83,13 @@
    ["in" (token-IN)]
    ["=>" (token-ARROW)]
    ["ANY" (token-ANY)]
+   ["E_TYPE" (token-ERROR 'E_TYPE)]
+   ["E_PROPNF" (token-ERROR 'E_PROPNF)]
+   ["E_VERBNF" (token-ERROR 'E_VERBNF)]
+   ["E_INVARG" (token-ERROR 'E_INVARG)]
+   ["E_ARGS" (token-ERROR 'E_ARGS)]
+   ["E_PERM" (token-ERROR 'E_PERM)]
+   ["E_QUOTA" (token-ERROR 'E_QUOTA)]
    ["true" (token-TRUE)]
    ["false" (token-FALSE)]
    [(char-set "?<>+-*/%^!:$=")
@@ -96,8 +105,6 @@
    [(:or (:seq (:? digits) "." digits)
          (:seq digits "."))
     (token-FLOAT (string->number lexeme))]))
-
-(struct objid (val) #:transparent)
 
 (struct expr-const (val) #:transparent)
 (struct expr-id (x) #:transparent)
@@ -119,6 +126,7 @@
 (struct expr-index (lhs rhs) #:transparent)
 (struct expr-set! (lhs rhs) #:transparent)
 (struct expr-catch (try codes except) #:transparent)
+(struct expr-error (type) #:transparent)
 
 (define moo-parse
   (parser
@@ -169,6 +177,8 @@
            (expr-const (objid $1))]
           [(ID)
            (expr-id $1)]
+          [(ERROR)
+           (expr-const $1)]
           [(TRUE)
            (expr-const 1)]
           [(FALSE)
