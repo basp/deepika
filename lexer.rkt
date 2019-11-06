@@ -22,7 +22,8 @@
    FOR
    ENDFOR
    WHILE
-   ENDWHILE))
+   ENDWHILE
+   RETURN))
 
 (define-empty-tokens error-tokens
   (ANY))
@@ -52,7 +53,6 @@
    DOT : $
    ARROW
    TO
-   RETURN
    EOF))
 
 (define-lex-abbrevs
