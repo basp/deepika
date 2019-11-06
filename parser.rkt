@@ -108,23 +108,14 @@
 
 (struct expr-const (val) #:transparent)
 (struct expr-id (x) #:transparent)
-(struct expr-add (lhs rhs) #:transparent)
-(struct expr-sub (lhs rhs) #:transparent)
-(struct expr-mul (lhs rhs) #:transparent)
-(struct expr-div (lhs rhs) #:transparent)
-(struct expr-mod (lhs rhs) #:transparent)
-(struct expr-exp (lhs rhs) #:transparent)
-(struct expr-neg (exp) #:transparent)
-(struct expr-not (exp) #:transparent)
-(struct expr-and (lhs rhs) #:transparent)
-(struct expr-or (lhs rhs) #:transparent)
+(struct expr-binary (op lhs rhs) #:transparent)
+(struct expr-unary (op val) #:transparent)
+(struct expr-set! (lhs rhs) #:transparent)
 (struct expr-list (val) #:transparent)
 (struct expr-cond (pred then else) #:transparent)
 (struct expr-prop (obj name) #:transparent)
 (struct expr-verb (obj vdesc args) #:transparent)
 (struct expr-call (fn args) #:transparent)
-(struct expr-index (lhs rhs) #:transparent)
-(struct expr-set! (lhs rhs) #:transparent)
 (struct expr-catch (try codes except) #:transparent)
 (struct expr-error (type) #:transparent)
 
@@ -192,26 +183,30 @@
           [(expr LPAREN arglist RPAREN)
            (expr-call $1 (expr-list $3))]
           [(expr LBRACK expr RBRACK)
-           (expr-index $1 $3)]
+           (expr-binary 'idx $1 $3)]
           [(expr + expr)
-           (expr-add $1 $3)]
+           (expr-binary 'add $1 $3)]
           [(expr - expr)
-           (expr-sub $1 $3)]
+           (expr-binary 'sub $1 $3)]
           [(expr * expr)
-           (expr-mul $1 $3)]
+           (expr-binary 'mul $1 $3)]
           [(expr / expr)
-           (expr-div $1 $3)]
+           (expr-binary 'div $1 $3)]
           [(expr % expr)
-           (expr-mod $1 $3)]
+           (expr-binary 'mod $1 $3)]
           [(expr ^ expr)
-           (expr-exp $1 $3)]
+           (expr-binary 'exp $1 $3)]
+          [(expr AND expr)
+           (expr-binary 'and $1 $3)]
+          [(expr OR expr)
+           (expr-binary 'or $1 $3)]
           [(expr = expr)
            (expr-set! $1 $3)]
           [(- expr)
            (prec NEG)
-           (expr-neg $2)]
+           (expr-unary 'neg $2)]
           [(! expr)
-           (expr-not $2)]
+           (expr-unary 'not $2)]
           [(LPAREN expr RPAREN)
            $2]
           [(LBRACE arglist RBRACE)
