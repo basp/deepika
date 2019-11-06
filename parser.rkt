@@ -61,19 +61,15 @@
     ;; error codes to catch
     (codes [(ANY) (expr-const 0)]
            [(ne-arglist) (expr-list $1)])
-
     ;; maybe empty elseif arms
     (elseifs [() null]
              [(ne-elseifs) (reverse $1)])
-
     ;; non-empty elseif arms
     (ne-elseifs [(elseifs ELSEIF LPAREN expr RPAREN statements)
                  (cons (cond-arm $4 $6) $1)])
-
     ;; else for if-statement
     (elsepart [() null]
               [(ELSE statements) $2])
-    
     ;; statement list
     (statements [(ne-statements)
                  (reverse $1)])
@@ -86,7 +82,6 @@
            (stmt-expr $1)]
           [(IF LPAREN expr RPAREN statements elseifs elsepart ENDIF)
            (stmt-cond (cons (cond-arm $3 $5) $6) $7)])
-
     ;; expressions
     (expr [(INTEGER)
            (expr-const $1)]
