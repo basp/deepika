@@ -37,7 +37,7 @@
    (grammar
     (start [() #f]
            [(expr) $1]
-           [(stmt) $1])
+           [(statements) $1])
     ;; maybe empty list
     (arglist [() null]
              [(ne-arglist) (reverse $1)])
@@ -61,6 +61,13 @@
     ;; error codes to catch
     (codes [(ANY) (expr-const 0)]
            [(ne-arglist) (expr-list $1)])
+    ;; statement list
+    (statements [(ne-statements)
+                 (reverse $1)])
+    ;; non-empty statement list
+    (ne-statements [(stmt) (list $1)]
+                   [(ne-statements stmt)
+                    (cons $2 $1)])
     ;; statements
     (stmt [(expr SEMICOLON)
            (stmt-expr $1)])
