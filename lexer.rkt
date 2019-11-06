@@ -26,6 +26,7 @@
 (define-empty-tokens symbol-tokens
   (COMMA
    COLON
+   SEMICOLON
    LBRACE
    RBRACE
    LPAREN
@@ -62,6 +63,7 @@
    [#\. (token-DOT)]
    [whitespace (return-without-pos (moo-lex input-port))]
    [":" (token-COLON)]
+   [";" (token-SEMICOLON)]
    ["," (token-COMMA)]
    ["`" (token-BACKTICK)]
    ["'" (token-SQUOTE)]

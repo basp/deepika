@@ -34,7 +34,8 @@
                     LBRACK LPAREN))
    (grammar
     (start [() #f]
-           [(expr) $1])
+           [(expr) $1]
+           [(stmt) $1])
     ;; maybe empty list
     (arglist [() null]
              [(ne-arglist) (reverse $1)])
@@ -58,6 +59,9 @@
     ;; error codes to catch
     (codes [(ANY) (expr-const 0)]
            [(ne-arglist) (expr-list $1)])
+    ;; statements
+    (stmt [(expr SEMICOLON)
+           (stmt-expr $1)])
     ;; expressions
     (expr [(INTEGER)
            (expr-const $1)]
