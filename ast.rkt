@@ -14,6 +14,8 @@
 (struct expr-catch (try codes except) #:transparent)
 (struct expr-error (type) #:transparent)
 (struct stmt-expr (expr) #:transparent)
+(struct stmt-cond (arms else) #:transparent)
+(struct cond-arm (pred body) #:transparent)
 
 (provide (struct-out expr-const)
          (struct-out expr-id)
@@ -28,4 +30,6 @@
          (struct-out expr-call)
          (struct-out expr-catch)
          (struct-out expr-error)
-         (struct-out stmt-expr))
+         (struct-out stmt-expr)
+         (struct-out stmt-cond)
+         (struct-out cond-arm))

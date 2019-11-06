@@ -16,7 +16,7 @@
   (TRUE
    FALSE
    IF
-   ELSEE
+   ELSE
    ELSEIF
    ENDIF))
 
@@ -92,6 +92,10 @@
    ["E_QUOTA" (token-ERROR 'E_QUOTA)]
    ["true" (token-TRUE)]
    ["false" (token-FALSE)]
+   ["if" (token-IF)]
+   ["else" (token-ELSE)]
+   ["elseif" (token-ELSEIF)]
+   ["endif" (token-ENDIF)]
    [(char-set "?<>+-*/%^!:$=")
     (string->symbol lexeme)]
    [name

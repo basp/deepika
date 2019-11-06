@@ -61,6 +61,16 @@
     ;; error codes to catch
     (codes [(ANY) (expr-const 0)]
            [(ne-arglist) (expr-list $1)])
+
+    (elseifs [() null]
+             [(ne-elseifs) (reverse $1)])
+
+    (ne-elseifs [(elseifs ELSEIF LPAREN expr RPAREN statements)
+                 (cons (cond-arm $4 $6) $1)])
+
+    (elsepart [() null]
+              [(ELSE statements) $2])
+    
     ;; statement list
     (statements [(ne-statements)
                  (reverse $1)])
@@ -70,7 +80,10 @@
                     (cons $2 $1)])
     ;; statements
     (stmt [(expr SEMICOLON)
-           (stmt-expr $1)])
+           (stmt-expr $1)]
+          [(IF LPAREN expr RPAREN statements elseifs elsepart ENDIF)
+           (stmt-cond (cons (cond-arm $3 $5) $6) $7)])
+
     ;; expressions
     (expr [(INTEGER)
            (expr-const $1)]
