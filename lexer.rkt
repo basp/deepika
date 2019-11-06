@@ -32,13 +32,13 @@
   (COMMA
    COLON
    SEMICOLON
+   BACKTICK
    LBRACE
    RBRACE
    LPAREN
    RPAREN
    LBRACK
-   RBRACK
-   BACKTICK))
+   RBRACK))
 
 (define-empty-tokens op-tokens
   (=
