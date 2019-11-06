@@ -157,8 +157,11 @@
                  (cons $3 $1)])
     (kvp [(expr ARROW expr)
           (cons $1 $3)])
-    (hash [(kvp) (list $1)]
-          [(hash COMMA kvp) (cons $3 $1)])
+    (hash [() null]
+          [(ne-hash) (reverse $1)])
+    (ne-hash [(kvp) (list $1)]
+             [(hash COMMA kvp)
+              (cons $3 $1)])
     (:default [() (expr-const 0)]
               [(ARROW expr) $2])
     (codes [(ANY) (expr-const 0)]
@@ -216,7 +219,7 @@
            $2]
           [(LBRACE arglist RBRACE)
            (expr-list $2)]
-          [(LBRACE hash RBRACE)
+          [(LBRACK hash RBRACK)
            (expr-hash (make-hash $2))]
           [(expr ? expr PIPE expr)
            (expr-cond $1 $3 $5)]
