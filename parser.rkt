@@ -160,7 +160,7 @@
     (hash [() null]
           [(ne-hash) (reverse $1)])
     (ne-hash [(kvp) (list $1)]
-             [(hash COMMA kvp)
+             [(ne-hash COMMA kvp)
               (cons $3 $1)])
     (:default [() (expr-const 0)]
               [(ARROW expr) $2])
