@@ -131,6 +131,10 @@
 
 (module+ test
   (require rackunit)
+  (let ([ast (parse/string "true")])
+    (check-equal? ast (expr-const 1)))
+  (let ([ast (parse/string "false")])
+    (check-equal? ast (expr-const 0)))
   (let ([ast (parse/string "123")])
     (check-equal? ast (expr-const 123)))
   (let ([ast (parse/string "123.456")])
