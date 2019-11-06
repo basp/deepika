@@ -5,6 +5,10 @@
          "lexer.rkt"
          "ast.rkt")
 
+; We do not support "lazy" floating point literals (e.g. "1." or ".123")
+; We do support range literals (e.g. "1..5")
+; We do support hash tables (e.g. "{foo => 123, "bar" => quux}")
+
 (define moo-parse
   (parser
    (start start)
@@ -81,7 +85,11 @@
     (stmt [(expr SEMICOLON)
            (stmt-expr $1)]
           [(IF LPAREN expr RPAREN statements elseifs elsepart ENDIF)
-           (stmt-cond (cons (cond-arm $3 $5) $6) $7)])
+           (stmt-cond (cons (cond-arm $3 $5) $6) $7)]
+          [(FOR ID IN LPAREN expr RPAREN statements ENDFOR)
+           (stmt-loop (expr-id $2) $5 $7)]
+          [(FOR ID IN LBRACK expr TO expr RBRACK statements ENDFOR)
+           (stmt-range (expr-id $2) $5 $7 $9)])
     ;; expressions
     (expr [(INTEGER)
            (expr-const $1)]

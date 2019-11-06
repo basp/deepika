@@ -18,7 +18,9 @@
    IF
    ELSE
    ELSEIF
-   ENDIF))
+   ENDIF
+   FOR
+   ENDFOR))
 
 (define-empty-tokens error-tokens
   (ANY))
@@ -33,7 +35,8 @@
    RPAREN
    LBRACK
    RBRACK
-   BACKTICK))
+   BACKTICK
+   TO))
 
 (define-empty-tokens op-tokens
   (=
@@ -61,6 +64,7 @@
   (lexer-src-pos
    [(eof) 'EOF]
    [whitespace (return-without-pos (moo-lex input-port))]
+   [".." (token-TO)]
    ["." (token-DOT)]
    [":" (token-COLON)]
    [";" (token-SEMICOLON)]
@@ -96,6 +100,8 @@
    ["else" (token-ELSE)]
    ["elseif" (token-ELSEIF)]
    ["endif" (token-ENDIF)]
+   ["for" (token-FOR)]
+   ["endfor" (token-ENDFOR)]
    [(char-set "?<>+-*/%^!:$=")
     (string->symbol lexeme)]
    [name
@@ -106,8 +112,7 @@
     (token-OBJECT (string->number (substring lexeme 1)))]
    [digits
     (token-INTEGER (string->number lexeme))]
-   [(:or (:seq (:? digits) "." digits)
-         (:seq digits "."))
+   [(:seq digits "." digits)
     (token-FLOAT (string->number lexeme))]))
 
 (provide moo-lex

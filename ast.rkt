@@ -15,6 +15,8 @@
 (struct expr-error (type) #:transparent)
 (struct stmt-expr (expr) #:transparent)
 (struct stmt-cond (arms else) #:transparent)
+(struct stmt-loop (id pred body) #:transparent)
+(struct stmt-range (id from to body) #:transparent)
 (struct cond-arm (pred body) #:transparent)
 
 (provide (struct-out expr-const)
@@ -32,4 +34,6 @@
          (struct-out expr-error)
          (struct-out stmt-expr)
          (struct-out stmt-cond)
+         (struct-out stmt-loop)
+         (struct-out stmt-range)
          (struct-out cond-arm))
