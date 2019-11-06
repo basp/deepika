@@ -9,13 +9,15 @@
   (parser
    (start start)
    (end EOF)
-   (src-pos)
+   ;; make the parser expect src-pos tokens
+   (src-pos) 
    (tokens
     value-tokens
     keyword-tokens
     op-tokens
     symbol-tokens
     error-tokens)
+   ;; this needs some additional work
    (error
     (λ (tok-ok? tok-name tok-value start-pos end-pos)
       (displayln start-pos)
