@@ -2,4 +2,4 @@
 
 (struct objid (num) #:prefab)
 
-(provide struct-out objid)
+(provide (struct-out objid))
