@@ -9,17 +9,17 @@
 
 (struct op (x) #:transparent)
 
-(struct mel () #:transparent)
-(struct msl () #:transparent)
-(struct lat () #:transparent)
+(struct make-empty-list () #:transparent)
+(struct make-singleton-list () #:transparent)
+(struct list-add-tail () #:transparent)
 
-(struct getp () #:transparent)
-(struct calv () #:transparent)
+(struct get-prop () #:transparent)
+(struct call-verb () #:transparent)
 
 (define (compile-list xs)
   (append (compile (car xs))
-          (list (msl))
-          (flatten (map (λ (y) (list (compile y) (lat))) (cdr xs)))))
+          (list (make-singleton-list))
+          (flatten (map (λ (y) (list (compile y) (list-add-tail))) (cdr xs)))))
 
 (define (compile ast)
   (match ast
@@ -28,11 +28,11 @@
     [(expr-id x)
      (list (ref x))]
     [(expr-list '())
-     (list (mel))]
+     (list (make-empty-list))]
     [(expr-list xs)
      #:when (equal? 1 (length xs))
      (append (compile (car xs))
-             (list (msl)))]
+             (list (make-singleton-list)))]
     [(expr-list xs)
      (compile-list xs)]
     [(expr-unary o x)
@@ -45,12 +45,12 @@
     [(expr-prop obj name)
      (append (compile obj)
              (compile name)
-             (list (getp)))]
+             (list (get-prop)))]
     [(expr-verb obj vdesc args)
      (append (compile obj)
              (compile vdesc)
              (compile args)
-             (list (calv)))]))
+             (list (call-verb)))]))
 
 (provide compile
          (struct-out imm)

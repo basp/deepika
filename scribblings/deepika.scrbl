@@ -354,3 +354,20 @@ matches anything at all.
     (match-verb-spec "food" "foo*")
     (match-verb-spec "foogleman" "foo*")
     (match-verb-spec "literally anything" "*")]
+
+@subsection{MOO programming language}
+The goal is to eventually support most of the LambdaMOO programming language in
+a faithful way except when improvements are clearly desirable from a usability
+perspective. In that spirit and in contrast to vanilla MOO we offer first class
+support for hash values for example.
+
+@subsubsection{Lexer}
+@defmodule[deepika/lexer]
+It's not likely that you have to work with the lexer module directy but it can
+be useful to know how it can be used.
+
+@subsubsection{Parser}
+@defmodule[deepika/parser]
+The parser uses the lexer to compose a value into an abstract syntax tree 
+(AST). The deepika parser will reasonably faithfully adhere to the specs from
+the LambdaMOO manual.
