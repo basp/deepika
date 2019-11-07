@@ -16,7 +16,10 @@
         #:requires (list "db.rkt" 
                          "tasks.rkt"
                          "cmd-parser.rkt"
-                         "match.rkt"))))
+                         "match.rkt"
+                         "lexer.rkt"
+                         "parser.rkt"
+                         "compiler.rkt"))))
 
 @title{Deepika}
 @author{basp}
@@ -366,8 +369,33 @@ support for hash values for example.
 It's not likely that you have to work with the lexer module directy but it can
 be useful to know how it can be used.
 
+@examples[
+    #:eval my-evaluator
+    (define ip (open-input-string "123 1.23 #5 \"bar\" foo"))
+    (moo-lex ip)
+    (moo-lex ip)
+    (moo-lex ip)
+    (moo-lex ip)
+    (moo-lex ip)
+    (moo-lex ip)
+]
+
 @subsubsection{Parser}
 @defmodule[deepika/parser]
-The parser uses the lexer to compose a value into an abstract syntax tree 
-(AST). The deepika parser will reasonably faithfully adhere to the specs from
-the LambdaMOO manual.
+The parser uses the stream of tokens coming from the lexer to compose a value 
+into an abstract syntax tree (AST).
+
+@examples[
+    #:eval my-evaluator
+    (parse/string "1 + 2 * 3")
+]
+
+@subsubsection{Compiler}
+@defmodule[deepika/compiler]
+The compiler can convert the AST that we get from the parser into a sequence of
+values that can be executed by a stack machine.
+
+@examples[
+    #:eval my-evaluator
+    (compile (parse/string "1 + 2 * 3"))
+]
