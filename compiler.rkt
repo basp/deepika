@@ -7,9 +7,19 @@
 (struct imm (x) #:transparent)
 (struct ref (x) #:transparent)
 
+(struct op (x) #:transparent)
+
+(struct mel () #:transparent)
+(struct msl () #:transparent)
+(struct lat () #:transparent)
+
+(struct getp () #:transparent)
+(struct calv () #:transparent)
+
 (define (compile-list xs)
-  (append (list 'make-empty-list)
-          (flatten (map (λ (y) (list (compile y) 'list-add-tail)) xs))))
+  (append (compile (car xs))
+          (list (msl))
+          (flatten (map (λ (y) (list (compile y) (lat))) (cdr xs)))))
 
 (define (compile ast)
   (match ast
@@ -18,25 +28,29 @@
     [(expr-id x)
      (list (ref x))]
     [(expr-list '())
-     (list 'make-empty-list)]
+     (list (mel))]
+    [(expr-list xs)
+     #:when (equal? 1 (length xs))
+     (append (compile (car xs))
+             (list (msl)))]
     [(expr-list xs)
      (compile-list xs)]
-    [(expr-unary op x)
+    [(expr-unary o x)
      (append (compile x)
-             (list op))]
-    [(expr-binary op x y)
+             (list (op o)))]
+    [(expr-binary o x y)
      (append (compile x)
              (compile y)
-             (list op))]
+             (list (op o)))]
     [(expr-prop obj name)
      (append (compile obj)
              (compile name)
-             (list 'get-prop))]
+             (list (getp)))]
     [(expr-verb obj vdesc args)
      (append (compile obj)
              (compile vdesc)
              (compile args)
-             (list 'call-verb))]))
+             (list (calv)))]))
 
 (provide compile
          (struct-out imm)
