@@ -5,10 +5,10 @@
 
 (define stack null)
 
-(define (priv/push x)
+(define (push x)
   (set! stack (cons x stack)))
 
-(define (priv/pop)
+(define (pop)
   (let ([x (car stack)])
     (set! stack (cdr stack))
     x))
@@ -16,10 +16,10 @@
 (define (eval/asm asm)
   (match asm
     ['() 0]
-    [(push x) (priv/push x)]
+    [(imm x) (push x)]
     ['add
-     (let ([x (priv/pop)]
-           [y (priv/pop)])
+     (let ([x (pop)]
+           [y (pop)])
        (displayln (+ x y)))]))
 
 (provide eval/asm)
