@@ -25,4 +25,4 @@
 (struct cond-arm (pred body) #:transparent)
 (struct except-arm (id codes stmts) #:transparent)
 
-(provide [all-defined-out])
+(provide (all-defined-out))
