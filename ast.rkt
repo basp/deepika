@@ -21,7 +21,9 @@
 (struct stmt-return (val) #:transparent)
 (struct stmt-break (id) #:transparent)
 (struct stmt-continue (id) #:transparent)
+(struct stmt-catch (body excepts) #:transparent)
 (struct cond-arm (pred body) #:transparent)
+(struct except-arm (id codes stmts) #:transparent)
 
 (provide (struct-out expr-const)
          (struct-out expr-id)
@@ -44,4 +46,6 @@
          (struct-out stmt-return)
          (struct-out stmt-break)
          (struct-out stmt-continue)
-         (struct-out cond-arm))
+         (struct-out stmt-catch)
+         (struct-out cond-arm)
+         (struct-out except-arm))

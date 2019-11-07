@@ -5,10 +5,6 @@
          "lexer.rkt"
          "ast.rkt")
 
-; Things that might be different to standard MOO parsing:
-; * does not support "lazy" floating point literals (e.g. "1." or ".123")
-; * does support hash tables (e.g. "[foo => 123, "bar" => quux]")
-
 (define moo-parse
   (parser
    (start start)
@@ -92,8 +88,18 @@
            (stmt-range (expr-id $2) $5 $7 $9)]
           [(WHILE LPAREN expr RPAREN statements ENDWHILE)
            (stmt-while $3 $5)]
+          [(RETURN SEMICOLON)
+           (stmt-return (expr-const 0))]
           [(RETURN expr SEMICOLON)
-           (stmt-return $2)])
+           (stmt-return $2)]
+          [(BREAK SEMICOLON)
+           (stmt-break #f)]
+          [(BREAK ID SEMICOLON)
+           (stmt-break $2)]
+          [(CONTINUE SEMICOLON)
+           (stmt-continue #f)]
+          [(CONTINUE ID SEMICOLON)
+           (stmt-continue $2)])
     ;; expressions
     (expr [(INTEGER)
            (expr-const $1)]
@@ -111,6 +117,8 @@
            (expr-const 1)]
           [(FALSE)
            (expr-const 0)]
+          [(TYPE)
+           (expr-const $1)]
           [($ ID)
            (expr-prop (objid 0) $2)]
           [(expr COLON ID LPAREN arglist RPAREN)
@@ -133,6 +141,18 @@
            (expr-binary 'mod $1 $3)]
           [(expr ^ expr)
            (expr-binary 'exp $1 $3)]
+          [(expr EQ expr)
+           (expr-binary 'eq $1 $3)]
+          [(expr NE expr)
+           (expr-binary 'ne $1 $3)]
+          [(expr < expr)
+           (expr-binary 'lt $1 $3)]
+          [(expr > expr)
+           (expr-binary 'gt $1 $3)]
+          [(expr LE expr)
+           (expr-binary 'le $1 $3)]
+          [(expr GE expr)
+           (expr-binary 'ge $1 $3)]
           [(expr AND expr)
            (expr-binary 'and $1 $3)]
           [(expr OR expr)
@@ -181,6 +201,20 @@
     (check-equal? ast (expr-unary 'neg (expr-const 123))))
   (let ([ast (parse/string "-123.456")])
     (check-equal? ast (expr-unary 'neg (expr-const 123.456))))
+  (let ([ast (parse/string "1.5 + 2.25")])
+    (check-equal? ast (expr-binary 'add (expr-const 1.5) (expr-const 2.25))))
+  (let ([ast (parse/string "1 + 2 * 3")])
+    (check-equal? ast (expr-binary 'add
+                                   (expr-const 1)
+                                   (expr-binary 'mul
+                                                (expr-const 2)
+                                                (expr-const 3)))))
+  (let ([ast (parse/string "(1 + 2) * 3")])
+    (check-equal? ast (expr-binary 'mul
+                                   (expr-binary 'add
+                                                (expr-const 1)
+                                                (expr-const 2))
+                                   (expr-const 3))))
   (let ([ast (parse/string "#123")])
     (check-equal? ast (expr-const (objid 123))))
   (let ([ast (parse/string "#-123")])
@@ -214,5 +248,51 @@
                          (cons (expr-const "quux")
                                (expr-const 123.456)))))))
   (let ([ast (parse/string "{foo}")])
-    (check-equal? ast (expr-list (list (expr-id "foo"))))))
+    (check-equal? ast (expr-list (list (expr-id "foo")))))
+  (let ([ast (parse/string "frotz()")])
+    (check-equal? ast (expr-call
+                       (expr-id "frotz")
+                       (expr-list '()))))
+  (let ([ast (parse/string "frotz(1, \"foo\", bar)")])
+    (check-equal? ast (expr-call
+                       (expr-id "frotz")
+                       (expr-list
+                        (list
+                         (expr-const 1)
+                         (expr-const "foo")
+                         (expr-id "bar"))))))
+  (let ([ast (parse/string "foo:bar(1,quux)")])
+    (check-equal? ast (expr-verb
+                       (expr-id "foo")
+                       (expr-id "bar")
+                       (expr-list
+                        (list (expr-const 1) (expr-id "quux"))))))
+  (let ([ast (parse/string "#123:quux()")])
+    (check-equal? ast (expr-verb
+                       (expr-const (objid 123))
+                       (expr-id "quux")
+                       (expr-list '()))))
+  (let ([ast (parse/string "#123:quux(\"foo\",bar,123)")])
+    (check-equal? ast (expr-verb
+                       (expr-const (objid 123))
+                       (expr-id "quux")
+                       (expr-list
+                        (list (expr-const "foo")
+                              (expr-id "bar")
+                              (expr-const 123))))))
+  (let ([ast (parse/string "{1,2,{3,4,{5,6},7},8}")])
+    (check-equal? ast (expr-list
+                       (list
+                        (expr-const 1)
+                        (expr-const 2)
+                        (expr-list
+                         (list
+                          (expr-const 3)
+                          (expr-const 4)
+                          (expr-list
+                           (list
+                            (expr-const 5)
+                            (expr-const 6)))
+                          (expr-const 7)))
+                        (expr-const 8))))))                           
 

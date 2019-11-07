@@ -10,7 +10,8 @@
    STRING
    OBJECT
    ID
-   ERROR))
+   ERROR
+   TYPE))
 
 (define-empty-tokens keyword-tokens
   (TRUE
@@ -23,7 +24,9 @@
    ENDFOR
    WHILE
    ENDWHILE
-   RETURN))
+   RETURN
+   BREAK
+   CONTINUE))
 
 (define-empty-tokens error-tokens
   (ANY))
@@ -97,6 +100,13 @@
    ["E_ARGS" (token-ERROR 'E_ARGS)]
    ["E_PERM" (token-ERROR 'E_PERM)]
    ["E_QUOTA" (token-ERROR 'E_QUOTA)]
+   ["INT" (token-TYPE 0)]
+   ["FLOAT" (token-TYPE 1)]
+   ["STR" (token-TYPE 2)]
+   ["LIST" (token-TYPE 3)]
+   ["OBJ" (token-TYPE 4)]
+   ["ERR" (token-TYPE 5)]
+   ["HASH" (token-TYPE 6)]
    ["true" (token-TRUE)]
    ["false" (token-FALSE)]
    ["if" (token-IF)]
@@ -108,6 +118,8 @@
    ["while" (token-WHILE)]
    ["endwhile" (token-ENDWHILE)]
    ["return" (token-RETURN)]
+   ["break" (token-BREAK)]
+   ["continue" (token-CONTINUE)]
    [(char-set "?<>+-*/%^!:$=")
     (string->symbol lexeme)]
    [name
