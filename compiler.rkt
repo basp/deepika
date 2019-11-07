@@ -6,13 +6,10 @@
 
 (struct imm (x) #:transparent)
 (struct ref (x) #:transparent)
-
 (struct op (x) #:transparent)
-
 (struct make-empty-list () #:transparent)
 (struct make-singleton-list () #:transparent)
 (struct list-add-tail () #:transparent)
-
 (struct get-prop () #:transparent)
 (struct call-verb () #:transparent)
 
