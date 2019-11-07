@@ -49,6 +49,4 @@
              (compile args)
              (list (call-verb)))]))
 
-(provide compile
-         (struct-out imm)
-         (struct-out ref))
+(provide [all-defined-out])
